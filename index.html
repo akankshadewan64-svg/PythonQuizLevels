@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Code Quest — Python Adventure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#161A3A;
+    --bg-panel:#20265A;
+    --bg-panel-2:#272E6E;
+    --gold:#FFC93C;
+    --teal:#2FE6C4;
+    --coral:#FF6B6B;
+    --mint:#3DDC97;
+    --ink:#EAEBFF;
+    --ink-dim:#A9AEDD;
+    --path-line:#3A4090;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 10%, rgba(255,201,60,0.08), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(47,230,196,0.08), transparent 40%),
+      var(--bg-deep);
+    color:var(--ink);
+    font-family:'Nunito', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  .wrap{max-width:900px;margin:0 auto;padding:28px 20px 60px;}
+
+  /* ---------- Header ---------- */
+  .app-header{text-align:center;margin-bottom:36px;}
+  .app-header .eyebrow{
+    font-family:'Space Mono', monospace;
+    letter-spacing:3px;
+    font-size:12px;
+    color:var(--teal);
+    text-transform:uppercase;
+  }
+  .app-header h1{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:800;
+    font-size:42px;
+    margin:6px 0 8px;
+    background:linear-gradient(90deg, var(--gold), var(--teal));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  .app-header p{color:var(--ink-dim);font-size:15px;margin:0;}
+
+  /* ---------- Level Map ---------- */
+  .map{position:relative;padding:20px 0 10px;}
+  .trail{
+    position:absolute;
+    left:34px; top:0; bottom:0;
+    width:4px;
+    background:repeating-linear-gradient(
+      to bottom, var(--path-line) 0 10px, transparent 10px 18px
+    );
+    z-index:0;
+  }
+  .node{
+    position:relative;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    margin-bottom:22px;
+    z-index:1;
+  }
+  .badge{
+    flex:0 0 auto;
+    width:70px;height:70px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Baloo 2',sans-serif;
+    font-size:26px;font-weight:700;
+    border:3px solid var(--bg-panel-2);
+    position:relative;
+  }
+  .badge .lock{position:absolute;font-size:22px;}
+  .node.unlocked .badge{
+    background:linear-gradient(145deg, var(--gold), #ffb63c);
+    color:#1B1B3A;
+    border-color:var(--gold);
+    box-shadow:0 0 0 6px rgba(255,201,60,0.12);
+  }
+  .node.completed .badge{
+    background:linear-gradient(145deg, var(--mint), #22b57c);
+    color:#0B2A1F;
+    border-color:var(--mint);
+    box-shadow:0 0 0 6px rgba(61,220,151,0.14);
+  }
+  .node.locked .badge{
+    background:var(--bg-panel);
+    color:var(--ink-dim);
+    border-color:var(--bg-panel-2);
+  }
+  .card{
+    flex:1;
+    background:var(--bg-panel);
+    border:1px solid var(--bg-panel-2);
+    border-radius:16px;
+    padding:16px 20px;
+    cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  .node.unlocked .card:hover, .node.completed .card:hover{
+    transform:translateX(4px);
+    border-color:var(--teal);
+  }
+  .node.locked .card{cursor:not-allowed;opacity:0.55;}
+  .card h3{
+    font-family:'Baloo 2',sans-serif;
+    margin:0 0 4px;
+    font-size:19px;
+  }
+  .card p{margin:0;color:var(--ink-dim);font-size:13.5px;}
+  .card .tag{
+    display:inline-block;margin-top:8px;
+    font-family:'Space Mono',monospace;
+    font-size:11px;padding:3px 9px;border-radius:20px;
+  }
+  .node.unlocked .tag{background:rgba(255,201,60,0.15);color:var(--gold);}
+  .node.completed .tag{background:rgba(61,220,151,0.15);color:var(--mint);}
+  .node.locked .tag{background:rgba(255,255,255,0.05);color:var(--ink-dim);}
+
+  /* ---------- Quiz screen ---------- */
+  .quiz-screen{display:none;}
+  .quiz-top{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:14px; flex-wrap:wrap; gap:10px;
+  }
+  .quiz-title{font-family:'Baloo 2',sans-serif;font-size:20px;}
+  .quiz-meta{
+    font-family:'Space Mono',monospace;font-size:13px;color:var(--ink-dim);
+    display:flex; gap:16px;
+  }
+  .timer-wrap{
+    background:var(--bg-panel-2); border-radius:10px; height:10px; overflow:hidden; margin-bottom:22px;
+  }
+  .timer-bar{height:100%; width:100%; background:linear-gradient(90deg,var(--teal),var(--gold)); transition:width 1s linear;}
+  .timer-bar.warn{background:linear-gradient(90deg,var(--coral),var(--gold));}
+
+  .q-card{
+    background:var(--bg-panel); border:1px solid var(--bg-panel-2); border-radius:18px;
+    padding:26px; margin-bottom:20px;
+  }
+  .q-type{
+    display:inline-block; font-family:'Space Mono',monospace; font-size:11px;
+    padding:4px 10px; border-radius:20px; margin-bottom:14px; letter-spacing:0.5px;
+  }
+  .q-type.output{background:rgba(47,230,196,0.15);color:var(--teal);}
+  .q-type.debug{background:rgba(255,107,107,0.15);color:var(--coral);}
+  .q-type.fillup{background:rgba(255,201,60,0.15);color:var(--gold);}
+  .q-type.concept{background:rgba(169,174,221,0.15);color:var(--ink-dim);}
+
+  .q-text{font-size:17px; font-weight:700; margin:0 0 14px; line-height:1.5;}
+  pre.code{
+    background:#0F1230; border:1px solid var(--bg-panel-2); border-radius:12px;
+    padding:16px 18px; font-family:'Space Mono',monospace; font-size:14px; color:#D9E4FF;
+    overflow-x:auto; margin:0 0 16px; line-height:1.6;
+  }
+  .options{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:560px){ .options{grid-template-columns:1fr;} }
+  .opt{
+    background:var(--bg-panel-2); border:2px solid transparent; border-radius:12px;
+    padding:13px 16px; font-family:'Space Mono',monospace; font-size:13.5px; color:var(--ink);
+    cursor:pointer; text-align:left; transition:border-color .12s ease, transform .12s ease;
+  }
+  .opt:hover:not(:disabled){border-color:var(--teal); transform:translateY(-1px);}
+  .opt:disabled{cursor:default;}
+  .opt.correct{border-color:var(--mint); background:rgba(61,220,151,0.16); color:var(--mint);}
+  .opt.wrong{border-color:var(--coral); background:rgba(255,107,107,0.16); color:var(--coral);}
+
+  .feedback{
+    margin-top:16px; font-size:13.5px; color:var(--ink-dim); min-height:20px;
+  }
+  .feedback .fb-status{
+    display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin-bottom:6px;
+  }
+  .feedback .fb-status.correct{color:var(--mint);}
+  .feedback .fb-status.wrong{color:var(--coral);}
+  .feedback .fb-status.timeup{color:var(--gold);}
+  .feedback .fb-explain{
+    display:block; color:var(--ink-dim); font-size:14px; line-height:1.5;
+  }
+  .next-btn{
+    margin-top:18px; display:none;
+    background:var(--gold); color:#1B1B3A; border:none; border-radius:10px;
+    padding:11px 22px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;
+    cursor:pointer;
+  }
+  .next-btn:hover{filter:brightness(1.08);}
+
+  /* ---------- Result screen ---------- */
+  .result-screen{display:none; text-align:center;}
+  .result-card{
+    background:var(--bg-panel); border:1px solid var(--bg-panel-2); border-radius:22px;
+    padding:44px 30px; max-width:520px; margin:0 auto;
+  }
+  .result-stars{font-size:40px; margin-bottom:6px;}
+  .result-score{font-family:'Baloo 2',sans-serif; font-size:44px; font-weight:800; margin:6px 0;}
+  .result-msg{color:var(--ink-dim); font-size:15px; margin-bottom:26px;}
+  .result-msg.pass{color:var(--mint);}
+  .result-msg.fail{color:var(--coral);}
+  .map-btn{
+    background:transparent; border:2px solid var(--teal); color:var(--teal);
+    border-radius:10px; padding:11px 26px; font-family:'Baloo 2',sans-serif;
+    font-weight:700; font-size:15px; cursor:pointer;
+  }
+  .map-btn:hover{background:rgba(47,230,196,0.1);}
+
+  .badge-emoji{font-size:26px;}
+
+  /* ---------- Progress code panel ---------- */
+  .progress-code-panel{
+    margin-top:24px; background:var(--bg-panel); border:1px solid var(--bg-panel-2);
+    border-radius:16px; overflow:hidden;
+  }
+  .pc-toggle{
+    width:100%; text-align:left; background:transparent; border:none; color:var(--ink);
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;
+    padding:16px 20px; cursor:pointer;
+  }
+  .pc-toggle:hover{color:var(--teal);}
+  .pc-body{padding:0 20px 20px;}
+  .pc-hint{color:var(--ink-dim); font-size:13px; line-height:1.5; margin:0 0 16px;}
+  .pc-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+  .pc-label{font-family:'Baloo 2',sans-serif; font-size:14px; color:var(--ink-dim);}
+  .pc-btn{
+    background:var(--teal); color:#0B2A2A; border:none; border-radius:8px;
+    padding:9px 16px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px;
+    cursor:pointer; margin-bottom:10px;
+  }
+  .pc-btn:hover{filter:brightness(1.08);}
+  .pc-btn.pc-copy{background:var(--gold); color:#1B1B3A;}
+  .pc-code-box{
+    width:100%; background:#0F1230; border:1px solid var(--bg-panel-2); border-radius:10px;
+    color:#D9E4FF; font-family:'Space Mono',monospace; font-size:12px; padding:10px;
+    resize:vertical; margin-bottom:10px;
+  }
+  .pc-status{font-size:12.5px; color:var(--mint); min-height:18px;}
+  .pc-status.error{color:var(--coral);}
+  .pc-divider{height:1px; background:var(--bg-panel-2); margin:16px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="app-header">
+    <div class="eyebrow">Level up your python skills</div>
+    <h1>🐍 Code Quest</h1>
+    <p>Beat each level to unlock the next one on the trail.</p>
+  </div>
+
+  <!-- LEVEL MAP -->
+  <div id="mapScreen">
+    <div class="map">
+      <div class="trail"></div>
+      <div id="levelNodes"></div>
+    </div>
+
+    <div class="progress-code-panel">
+      <button class="pc-toggle" id="pcToggle">💾 Save or load my progress with a code</button>
+      <div class="pc-body" id="pcBody" style="display:none;">
+        <p class="pc-hint">Your progress is saved automatically when you're signed in. If you're not signed in (or want to continue on a different device), use a progress code instead.</p>
+
+        <div class="pc-row">
+          <span class="pc-label">Get my code</span>
+          <button class="pc-btn" id="pcGenerateBtn">Show my code</button>
+        </div>
+        <textarea class="pc-code-box" id="pcCodeOutput" readonly rows="2" style="display:none;"></textarea>
+        <button class="pc-btn pc-copy" id="pcCopyBtn" style="display:none;">Copy code</button>
+        <div class="pc-status" id="pcCopyStatus"></div>
+
+        <div class="pc-divider"></div>
+
+        <div class="pc-row">
+          <span class="pc-label">Load a code</span>
+        </div>
+        <textarea class="pc-code-box" id="pcCodeInput" rows="2" placeholder="Paste your progress code here..."></textarea>
+        <button class="pc-btn" id="pcLoadBtn">Load progress</button>
+        <div class="pc-status" id="pcLoadStatus"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ SCREEN -->
+  <div id="quizScreen" class="quiz-screen">
+    <div class="quiz-top">
+      <div class="quiz-title" id="quizTitle"></div>
+      <div class="quiz-meta">
+        <span id="qProgress">Q 1/15</span>
+        <span id="qScoreLive">Score: 0</span>
+        <span id="qTimeLeft">⏱ 15s</span>
+      </div>
+    </div>
+    <div class="timer-wrap"><div class="timer-bar" id="timerBar"></div></div>
+
+    <div class="q-card">
+      <div class="q-type" id="qType"></div>
+      <p class="q-text" id="qText"></p>
+      <pre class="code" id="qCode" style="display:none;"></pre>
+      <div class="options" id="qOptions"></div>
+      <div class="feedback" id="qFeedback"></div>
+      <button class="next-btn" id="nextBtn">Next Question →</button>
+    </div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="resultScreen" class="result-screen">
+    <div class="result-card">
+      <div class="result-stars" id="resultStars"></div>
+      <div class="result-score" id="resultScore"></div>
+      <div class="result-msg" id="resultMsg"></div>
+      <button class="map-btn" id="backToMapBtn">Back to Map</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ============ QUIZ DATA ============ */
+const LEVELS = [
+  {
+    id:1, title:"Print and Variables", icon:"🖨️",
+    desc:"Learn how Python shows things on screen and stores information.",
+    questions:[
+      {type:"output", code:'print("Hello, World!")', q:"What will this code print?",
+        options:['Hello, World!','"Hello, World!"','Hello World','Error'], correct:0,
+        explanation:'print() shows the text inside the quotes, but the quote marks themselves are not displayed.'},
+      {type:"output", code:'x = 5\nprint(x)', q:"What gets printed?",
+        options:['x','5','"x"','Error'], correct:1,
+        explanation:'x is a variable holding the number 5, so print(x) shows the value stored in it: 5.'},
+      {type:"fillup", code:'____("Sam is here!")', q:"Fill in the blank to show text on screen.",
+        options:['print','input','say','text'], correct:0,
+        explanation:'print() is the function Python uses to display text on the screen.'},
+      {type:"debug", code:'Print("Hi")', q:"What's wrong with this code?",
+        options:['Nothing, it works fine','print should be lowercase','"Hi" needs no quotes','Missing a semicolon'], correct:1,
+        explanation:"Python is case-sensitive, so the function must be written as print, not Print."},
+      {type:"concept", q:"Which of these is a valid Python variable name?",
+        options:['2cool','my-age','my_age','class'], correct:2,
+        explanation:"Variable names can't start with a number or contain a hyphen, and 'class' is a reserved keyword. my_age follows the rules."},
+      {type:"output", code:"print('5' + '3')", q:"What does this print?",
+        options:['8','53','Error','5 3'], correct:1,
+        explanation:"'5' and '3' are text (strings), not numbers, so + joins them together into '53' instead of adding them."},
+      {type:"fillup", code:'age = ___\nprint("You are", age, "years old")', q:"Fill in the blank so age stores the number 12.",
+        options:['12','"12"','twelve','age'], correct:0,
+        explanation:'To store a whole number, write it without quotes: age = 12.'},
+      {type:"output", code:'name = "Max"\nprint("Hi " + name)', q:"What gets printed?",
+        options:['Hi Max','Hi name','Error','Hiname'], correct:0,
+        explanation:'+ joins the text "Hi " with the value stored in name ("Max"), giving "Hi Max".'},
+      {type:"debug", code:'print("Score: " + 90)', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","You can't join text and a number with +", "Score needs no colon","90 should be spelled out"], correct:1,
+        explanation:'You cannot join text and a number using + — Python needs str(90) or a comma instead.'},
+      {type:"output", code:'x = 10\nx = "ten"\nprint(x)', q:"What gets printed?",
+        options:['10','ten','Error','10ten'], correct:1,
+        explanation:'Variables can be given a new value at any time. x is reassigned to "ten", so that\'s what gets printed.'},
+      {type:"output", code:'x = 7\ny = x\ny = 9\nprint(x)', q:"What gets printed?",
+        options:['7','9','Error','None'], correct:0,
+        explanation:'y = x copies the value into y, but x and y are separate variables. Changing y does not change x, so x stays 7.'},
+      {type:"concept", q:"Which symbol is used to give a variable a value?",
+        options:['==','=','->',':='], correct:1,
+        explanation:'A single = sign assigns a value to a variable. == is used later for comparing values.'},
+      {type:"output", code:'print(1, 2, 3)', q:"What gets printed?",
+        options:['123','1 2 3','[1, 2, 3]','Error'], correct:1,
+        explanation:'When you separate items with commas in print(), Python prints them with a space between each one.'},
+      {type:"fillup", code:'num = 8\nprint("My favorite number is", ___)', q:"Fill in the blank to show the value of num.",
+        options:['num','"num"','Num','number'], correct:0,
+        explanation:'Writing num (no quotes) refers to the variable\'s value. "num" in quotes would just print the word num.'},
+      {type:"output", code:'print("Python" + "3")', q:"What gets printed?",
+        options:['Python 3','Python3','Error','3Python'], correct:1,
+        explanation:'+ joins two strings exactly as they are, with no extra space added, giving "Python3".'},
+    ]
+  },
+  {
+    id:2, title:"Arithmetic Operators", icon:"➕",
+    desc:"Add, subtract, multiply, divide — and a few tricky math tricks.",
+    questions:[
+      {type:"output", code:'print(5 + 3)', q:"What gets printed?", options:['8','53','15','Error'], correct:0,
+        explanation:'+ adds the two numbers together: 5 + 3 = 8.'},
+      {type:"output", code:'print(10 - 4)', q:"What gets printed?", options:['6','14','40','Error'], correct:0,
+        explanation:'- subtracts the second number from the first: 10 - 4 = 6.'},
+      {type:"output", code:'print(6 * 3)', q:"What gets printed?", options:['9','63','18','2'], correct:2,
+        explanation:'* multiplies the two numbers: 6 * 3 = 18.'},
+      {type:"output", code:'print(10 / 3)', q:"What gets printed?", options:['3','3.3333333333333335','3.3','Error'], correct:1,
+        explanation:'/ always gives a decimal answer in Python, showing many digits after the point.'},
+      {type:"output", code:'print(10 // 3)', q:"What gets printed? (// means floor division)", options:['3.33','3','4','1'], correct:1,
+        explanation:'// divides and rounds down to the nearest whole number, so 10 // 3 = 3.'},
+      {type:"output", code:'print(10 % 3)', q:"What gets printed? (% gives the remainder)", options:['3','3.33','1','0'], correct:2,
+        explanation:'10 divided by 3 is 3 with 1 left over, and % gives that leftover: 1.'},
+      {type:"output", code:'print(2 ** 3)', q:"What gets printed? (** means 'to the power of')", options:['6','8','9','23'], correct:1,
+        explanation:'** raises a number to a power: 2 ** 3 means 2 x 2 x 2 = 8.'},
+      {type:"debug", code:'print(5 + "3")', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","You can't add a number and text directly","5 should be in quotes too","+ should be a *"], correct:1,
+        explanation:'5 is a number and "3" is text, and Python cannot add these two different types together with +.'},
+      {type:"output", code:'print(2 + 3 * 4)', q:"What gets printed? (remember order of operations!)", options:['20','14','24','9'], correct:1,
+        explanation:'Multiplication happens before addition: 3 * 4 = 12, then 2 + 12 = 14.'},
+      {type:"output", code:'print((2 + 3) * 4)', q:"What gets printed?", options:['14','20','9','24'], correct:1,
+        explanation:'Parentheses run first: 2 + 3 = 5, then 5 * 4 = 20.'},
+      {type:"concept", q:"Which operator finds the remainder of a division?", options:['/','//','%','*'], correct:2,
+        explanation:'% is called the modulus operator and gives the remainder left over after dividing.'},
+      {type:"output", code:'x = 5\nx += 3\nprint(x)', q:"What gets printed?", options:['5','3','8','53'], correct:2,
+        explanation:'x += 3 means x = x + 3, so 5 + 3 = 8.'},
+      {type:"output", code:'x = 10\nx -= 4\nprint(x)', q:"What gets printed?", options:['10','4','14','6'], correct:3,
+        explanation:'x -= 4 means x = x - 4, so 10 - 4 = 6.'},
+      {type:"fillup", code:'result = 6 ___ 7', q:"Fill in the blank to multiply 6 and 7.", options:['*','x','**','//'], correct:0,
+        explanation:'The * symbol is used for multiplication in Python, not x.'},
+      {type:"output", code:'print(3 ** 2)', q:"What gets printed?", options:['6','5','9','32'], correct:2,
+        explanation:'3 ** 2 means 3 x 3 = 9.'},
+    ]
+  },
+  {
+    id:3, title:"Comparison Operators", icon:"⚖️",
+    desc:"Compare numbers and values using ==, !=, >, <, and more.",
+    questions:[
+      {type:"output", code:'print(5 > 3)', q:"What gets printed?", options:['True','False','5','Error'], correct:0,
+        explanation:'5 is greater than 3, so the comparison is True.'},
+      {type:"output", code:'print(5 < 3)', q:"What gets printed?", options:['True','False','5','Error'], correct:1,
+        explanation:'5 is not less than 3, so the comparison is False.'},
+      {type:"output", code:'print(5 == 5)', q:"What gets printed?", options:['True','False','5','Error'], correct:0,
+        explanation:'== checks if two values are equal. 5 equals 5, so this is True.'},
+      {type:"output", code:'print(5 != 5)', q:"What gets printed?", options:['True','False','5','Error'], correct:1,
+        explanation:'!= checks if two values are different. Since 5 and 5 are the same, the result is False.'},
+      {type:"output", code:'print(5 >= 5)', q:"What gets printed?", options:['True','False','5','Error'], correct:0,
+        explanation:">= means 'greater than or equal to'. Since 5 equals 5, this is True."},
+      {type:"output", code:'print(5 <= 4)', q:"What gets printed?", options:['True','False','5','Error'], correct:1,
+        explanation:"<= means 'less than or equal to'. 5 is not less than or equal to 4, so this is False."},
+      {type:"debug", code:'if 5 = 5:\n    print("equal")', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Should use == instead of = to compare","5 needs quotes","print needs no arguments"], correct:1,
+        explanation:'A single = assigns a value; comparing two values for equality needs double equals ==.'},
+      {type:"output", code:'print("apple" == "Apple")', q:"What gets printed?", options:['True','False','Error','apple'], correct:1,
+        explanation:"Python compares text exactly, including uppercase and lowercase letters, so 'apple' and 'Apple' are not equal."},
+      {type:"output", code:'print(3 < 5 < 10)', q:"What gets printed?", options:['True','False','Error','3'], correct:0,
+        explanation:'Python can chain comparisons: this checks 3 < 5 AND 5 < 10, and both are true.'},
+      {type:"concept", q:"Which operator checks 'not equal to'?", options:['==','!=','<>','~='], correct:1,
+        explanation:"!= is Python's symbol for 'not equal to'."},
+      {type:"output", code:'print(7 >= 7)', q:"What gets printed?", options:['True','False','7','Error'], correct:0,
+        explanation:"7 is equal to 7, and >= includes equal values, so this is True."},
+      {type:"fillup", code:'if x ___ 10:\n    print("ok")', q:"Fill in the blank to check if x is less than or equal to 10.",
+        options:['<=','=<','<','=='], correct:0,
+        explanation:"<= means 'less than or equal to'. The less-than symbol always comes first."},
+      {type:"output", code:'print(2 > 1)', q:"What gets printed?", options:['True','False','2','Error'], correct:0,
+        explanation:'2 is greater than 1, so this is True.'},
+      {type:"debug", code:'print(5 =< 10)', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","The symbols are in the wrong order, it should be <=","5 needs to be in quotes","10 needs to be in quotes"], correct:1,
+        explanation:"Python's 'less than or equal to' symbol is written <= not =<."},
+      {type:"output", code:'print("10" == 10)', q:"What gets printed?", options:['True','False','10','Error'], correct:1,
+        explanation:"'10' is text and 10 is a number — different types are never equal in Python, so this is False."},
+    ]
+  },
+  {
+    id:4, title:"Logical Operators", icon:"🔀",
+    desc:"Combine conditions using and, or, and not like a true Python detective.",
+    questions:[
+      {type:"output", code:'print(True and False)', q:"What gets printed?", options:['True','False','Error','None'], correct:1,
+        explanation:'and needs BOTH sides to be True. Since one side is False, the whole thing is False.'},
+      {type:"output", code:'print(True or False)', q:"What gets printed?", options:['True','False','Error','None'], correct:0,
+        explanation:'or only needs ONE side to be True. Since True is on one side, the result is True.'},
+      {type:"output", code:'print(not True)', q:"What gets printed?", options:['True','False','Error','Not True'], correct:1,
+        explanation:'not flips a value to its opposite. not True becomes False.'},
+      {type:"output", code:'print(5 > 3 and 2 < 4)', q:"What gets printed?", options:['True','False','Error','5'], correct:0,
+        explanation:'5 > 3 is True and 2 < 4 is True, and since both sides of and are True, the result is True.'},
+      {type:"output", code:'print(5 > 3 or 2 > 4)', q:"What gets printed?", options:['True','False','Error','None'], correct:0,
+        explanation:'5 > 3 is True, and since or only needs one side to be True, the whole thing is True.'},
+      {type:"output", code:'print(not (5 > 3))', q:"What gets printed?", options:['True','False','Error','5'], correct:1,
+        explanation:'5 > 3 is True, and not flips it to False.'},
+      {type:"output", code:'print(10 == 10)', q:"What gets printed?", options:['True','False','10','Error'], correct:0,
+        explanation:'== checks if two values are equal. 10 equals 10, so the result is True.'},
+      {type:"output", code:'print(10 != 5)', q:"What gets printed?", options:['True','False','5','Error'], correct:0,
+        explanation:'!= checks if two values are NOT equal. 10 is not 5, so the result is True.'},
+      {type:"debug", code:'if x = 5:\n    print("five")', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Should use == instead of = to compare","5 should be in quotes","print needs a colon"], correct:1,
+        explanation:'A single = assigns a value, but comparing values requires the double equals sign ==.'},
+      {type:"output", code:'x = 5\nif x > 0 and x < 10:\n    print("valid")', q:"What gets printed?", options:['valid','nothing','Error','True'], correct:0,
+        explanation:'x is 5, so both x > 0 and x < 10 are True, meaning the and condition passes and "valid" is printed.'},
+      {type:"output", code:'print(True and True and False)', q:"What gets printed?", options:['True','False','Error','None'], correct:1,
+        explanation:'and needs every single value to be True. Since the last one is False, the whole chain becomes False.'},
+      {type:"concept", q:"Which operator checks if two values are equal?", options:['=','==','!=','and'], correct:1,
+        explanation:'== compares two values to see if they match. = is only for assigning values.'},
+      {type:"output", code:'print(not (5 == 5))', q:"What gets printed?", options:['True','False','5','Error'], correct:1,
+        explanation:'5 == 5 is True, and not flips that True into False.'},
+      {type:"fillup", code:'age = 12\nif age > 10 ___ age < 15:\n    print("tween")', q:"Fill in the blank so BOTH conditions must be true.",
+        options:['and','or','not','=='], correct:0,
+        explanation:'and requires both conditions to be True at the same time before running the code inside the if.'},
+      {type:"output", code:'print(3 != 3)', q:"What gets printed?", options:['True','False','3','Error'], correct:1,
+        explanation:'3 is equal to 3, so "not equal" (!=) is False.'},
+    ]
+  },
+  {
+    id:5, title:"Conditional Statements", icon:"🚦",
+    desc:"Make decisions in code using if, elif, and else.",
+    questions:[
+      {type:"output", code:'x = 5\nif x > 0:\n    print("positive")', q:"What gets printed?", options:['positive','nothing','Error','0'], correct:0,
+        explanation:"x is 5, which is greater than 0, so the if condition is True and 'positive' is printed."},
+      {type:"output", code:'x = -3\nif x > 0:\n    print("positive")\nelse:\n    print("non-positive")', q:"What gets printed?",
+        options:['positive','non-positive','Error','nothing'], correct:1,
+        explanation:"x is -3, which is not greater than 0, so the else branch runs instead."},
+      {type:"debug", code:'if x > 5\n    print("big")', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Missing a colon after the condition","x needs to be in quotes","print needs no parentheses"], correct:1,
+        explanation:'Every if statement needs a colon : right after its condition.'},
+      {type:"output", code:'x = 0\nif x > 0:\n    print("pos")\nelif x == 0:\n    print("zero")\nelse:\n    print("neg")', q:"What gets printed?",
+        options:['pos','zero','neg','nothing'], correct:1,
+        explanation:"x is 0, which fails the first check but matches elif x == 0, so 'zero' is printed."},
+      {type:"concept", q:"Which keyword checks another condition only if the first if was False?",
+        options:['else','elif','and','while'], correct:1,
+        explanation:"elif (short for 'else if') lets you test another condition if the earlier ones were False."},
+      {type:"output", code:'x = 10\nif x > 5 and x < 20:\n    print("in range")\nelse:\n    print("out")', q:"What gets printed?",
+        options:['in range','out','Error','5'], correct:0,
+        explanation:"x is 10, which is both greater than 5 and less than 20, so 'in range' is printed."},
+      {type:"fillup", code:'if x > 0:\n    print("pos")\n___:\n    print("not pos")', q:"Fill in the blank to run code only when the if condition is False.",
+        options:['else','elif x<0','then','also'], correct:0,
+        explanation:'else runs whenever the if condition above it was False, with no extra condition needed.'},
+      {type:"debug", code:'x = 5\nif x == 5\n    print("five")', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Missing a colon after the condition","x should be in quotes","print needs an else"], correct:1,
+        explanation:'Every if line must end with a colon : before the indented code that follows.'},
+      {type:"output", code:'age = 13\nif age >= 13:\n    print("teen")\nelse:\n    print("kid")', q:"What gets printed?",
+        options:['teen','kid','Error','13'], correct:0,
+        explanation:'age is 13, and 13 >= 13 is True, so "teen" is printed.'},
+      {type:"output", code:'x = 7\nif x % 2 == 0:\n    print("even")\nelse:\n    print("odd")', q:"What gets printed?",
+        options:['even','odd','Error','7'], correct:1,
+        explanation:'7 % 2 gives 1, not 0, so the condition is False and "odd" is printed.'},
+      {type:"concept", q:"What does elif stand for?", options:["'else if'","'end if'","'equal if'","'extra if'"], correct:0,
+        explanation:"elif is short for 'else if' — it lets you check another condition in the same chain."},
+      {type:"output", code:'x = 2\nif x == 1:\n    print("one")\nelif x == 2:\n    print("two")\nelif x == 3:\n    print("three")', q:"What gets printed?",
+        options:['one','two','three','nothing'], correct:1,
+        explanation:'x is 2, which matches the second elif condition, so "two" is printed.'},
+      {type:"fillup", code:'age = 10\nif age < 13 ___ age >= 0:\n    print("child")', q:"Fill in the blank so BOTH conditions must be true.",
+        options:['and','or','not','=='], correct:0,
+        explanation:'and requires both conditions to be True at the same time.'},
+      {type:"debug", code:'x = 5\nif x > 0:\nprint("positive")', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","print needs to be indented under the if","x needs to be in quotes","The colon is missing"], correct:1,
+        explanation:'Code that belongs inside an if block must be indented; here print is not indented, so Python will raise an error.'},
+      {type:"output", code:'x = 15\nif x > 20:\n    print("big")\nelse:\n    print("small")', q:"What gets printed?",
+        options:['big','small','Error','15'], correct:1,
+        explanation:'x is 15, which is not greater than 20, so the else branch runs and "small" is printed.'},
+    ]
+  },
+  {
+    id:6, title:"For Loops & While Loops", icon:"🔁",
+    desc:"Repeat actions using for loops and while loops.",
+    questions:[
+      {type:"output", code:'for i in range(3):\n    print(i)', q:"What gets printed (in order)?",
+        options:['0, 1, 2','1, 2, 3','0, 1, 2, 3','1, 2'], correct:0,
+        explanation:'range(3) counts from 0 up to (but not including) 3, so it gives 0, 1, 2.'},
+      {type:"output", code:'for i in range(1, 4):\n    print(i)', q:"What gets printed (in order)?",
+        options:['1, 2, 3','1, 2, 3, 4','0, 1, 2, 3','2, 3, 4'], correct:0,
+        explanation:'range(1,4) starts at 1 and stops before 4, giving 1, 2, 3.'},
+      {type:"output", code:'for i in range(5, 0, -1):\n    print(i)', q:"What gets printed (in order)?",
+        options:['0, 1, 2, 3, 4, 5','5, 4, 3, 2, 1','1, 2, 3, 4, 5','5, 4, 3, 2, 1, 0'], correct:1,
+        explanation:'The -1 step makes range count backwards from 5 down to (but not including) 0, giving 5, 4, 3, 2, 1.'},
+      {type:"debug", code:'for i in range(5)\n    print(i)', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Missing a colon after range(5)","range(5) should be range(5,5)","print needs no arguments"], correct:1,
+        explanation:'Every for loop line needs a colon : right after it, before the indented body.'},
+      {type:"concept", q:"What numbers does range(5) produce?", options:['1 to 5','0 to 4','0 to 5','1 to 4'], correct:1,
+        explanation:'range(5) starts at 0 by default and stops right before 5, giving 0, 1, 2, 3, 4.'},
+      {type:"output", code:'i = 0\nwhile i < 3:\n    print(i)\n    i += 1', q:"What gets printed (in order)?",
+        options:['0, 1, 2','1, 2, 3','0, 1, 2, 3','Nothing'], correct:0,
+        explanation:'The loop starts at i=0 and keeps going while i is less than 3, printing 0, 1, then 2 before stopping.'},
+      {type:"debug", code:'i = 0\nwhile i < 3:\nprint(i)\ni += 1', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","The lines inside the loop need to be indented","while needs a colon removed","i += 1 should come before print"], correct:1,
+        explanation:'Everything that belongs inside the while loop must be indented under it, or Python will raise an error.'},
+      {type:"output", code:'total = 0\nfor i in range(1, 4):\n    total += i\nprint(total)', q:"What gets printed?",
+        options:['3','6','9','10'], correct:1,
+        explanation:'The loop adds 1 + 2 + 3 to total, which equals 6.'},
+      {type:"fillup", code:'for i in ___(5):\n    print(i)', q:"Fill in the blank to loop 5 times.",
+        options:['range','loop','count','times'], correct:0,
+        explanation:'range() is the function Python uses to generate a sequence of numbers to loop through.'},
+      {type:"output", code:'for i in range(3):\n    print("Hi")', q:"What gets printed?",
+        options:['Hi (once)','Hi, Hi (twice)','Hi, Hi, Hi (three times)','Nothing'], correct:2,
+        explanation:"The loop body runs once for every number in range(3), which is 3 times, so 'Hi' is printed three times."},
+      {type:"concept", q:"Which loop repeats as long as a condition stays True?", options:['for loop','while loop','if statement','print loop'], correct:1,
+        explanation:'A while loop keeps running its body over and over as long as its condition is True.'},
+      {type:"debug", code:'i = 5\nwhile i > 0:\n    print(i)', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","i is never decreased, so the loop runs forever","print should be inside the while condition","i should start at 0"], correct:1,
+        explanation:'Without something like i -= 1 inside the loop, i stays 5 forever and the condition i > 0 never becomes False.'},
+      {type:"output", code:'for i in range(2, 10, 3):\n    print(i)', q:"What gets printed (in order)?",
+        options:['2, 5, 8','2, 3, 4','2, 4, 6, 8','3, 6, 9'], correct:0,
+        explanation:'The third number in range is the step size, so counting starts at 2 and jumps by 3 each time: 2, 5, 8.'},
+      {type:"fillup", code:'i = 5\nwhile i ___ 0:\n    print(i)\n    i -= 1', q:"Fill in the blank so the loop keeps running while i is above 0.",
+        options:['>','<','==','!='], correct:0,
+        explanation:'The loop should continue as long as i is greater than 0, so > is the correct comparison.'},
+      {type:"output", code:'count = 1\nwhile count <= 3:\n    print(count)\n    count += 1', q:"What gets printed (in order)?",
+        options:['1, 2, 3','0, 1, 2','1, 2, 3, 4','2, 3'], correct:0,
+        explanation:'The loop runs while count is 1, 2, and 3, printing each before count becomes 4 and stops.'},
+    ]
+  },
+  {
+    id:7, title:"Nested Loops", icon:"🧩",
+    desc:"Loops inside loops — perfect for grids and patterns.",
+    questions:[
+      {type:"concept", q:"What is a nested loop?", options:["A loop inside another loop","A loop that never ends","A loop with no body","A loop that runs backwards"], correct:0,
+        explanation:'A nested loop is simply a loop placed inside the body of another loop.'},
+      {type:"output", code:'for i in range(2):\n    for j in range(3):\n        print("*", end="")', q:"How many stars (*) get printed in total?",
+        options:['2','3','5','6'], correct:3,
+        explanation:'The outer loop runs 2 times, and each time the inner loop runs 3 times, so 2 x 3 = 6 stars are printed.'},
+      {type:"debug", code:'for i in range(2):\nfor j in range(2):\n    print(i, j)', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","The inner for loop needs to be indented","range(2) is not allowed","print needs no arguments"], correct:1,
+        explanation:"The inner for loop must be indented one level inside the outer loop, otherwise Python won't know it belongs inside."},
+      {type:"output", code:'for i in range(3):\n    for j in range(2):\n        print(i, j)', q:"How many lines does this code print in total?",
+        options:['2','3','5','6'], correct:3,
+        explanation:'The outer loop runs 3 times and the inner loop runs 2 times for each of those, so 3 x 2 = 6 lines are printed.'},
+      {type:"fillup", code:'for i in range(2):\n    ___ j in range(3):\n        print(i, j)', q:"Fill in the blank to create the inner loop.",
+        options:['for','while','range','if'], correct:0,
+        explanation:'A nested loop starts with its own for keyword, just like any other loop.'},
+      {type:"concept", q:"Nested loops are especially useful for working with...",
+        options:["Single numbers only","Grids, tables, and patterns","Only text messages","Turning off loops"], correct:1,
+        explanation:'Nested loops let you repeat an action across rows and columns, which is perfect for grids, tables, and patterns.'},
+      {type:"output", code:'count = 0\nfor i in range(3):\n    for j in range(3):\n        count += 1\nprint(count)', q:"What gets printed?",
+        options:['3','6','9','12'], correct:2,
+        explanation:'The inner loop adds 1 to count every time it runs, and it runs 3 x 3 = 9 times in total.'},
+      {type:"debug", code:'for i in range(3):\n    for j in range(3)\n        print(i, j)', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","The inner for line is missing a colon","i and j must be the same letter","range(3) should be range(3,3)"], correct:1,
+        explanation:'Every for loop line must end with a colon : before its indented body.'},
+      {type:"output", code:'for i in range(2):\n    for j in range(2):\n        print(i, j)', q:"Which pairs get printed (in order)?",
+        options:['(0,0) (0,1) (1,0) (1,1)','(0,0) (1,0) (0,1) (1,1)','(0,0) (0,0) (1,1) (1,1)','(1,1) (1,0) (0,1) (0,0)'], correct:0,
+        explanation:'For each value of i, the inner loop runs through all its j values before i moves to the next number.'},
+      {type:"concept", q:"If the outer loop runs 4 times and the inner loop runs 5 times each round, how many total repeats happen?",
+        options:['9','15','20','25'], correct:2,
+        explanation:'Multiply the two loop counts together: 4 x 5 = 20 total repeats.'},
+      {type:"fillup", code:'for row in range(___):\n    for col in range(3):\n        print("#", end="")', q:"Fill in the blank so the outer loop runs 4 times.",
+        options:['3','4','5','12'], correct:1,
+        explanation:'range(4) makes the outer loop repeat exactly 4 times.'},
+      {type:"output", code:'for i in range(3):\n    print("Row", i)\n    for j in range(2):\n        print("  Col", j)', q:"How many lines starting with 'Col' get printed in total?",
+        options:['2','3','5','6'], correct:3,
+        explanation:"The inner loop prints 'Col' twice for each of the 3 outer rounds, so 3 x 2 = 6 lines."},
+      {type:"concept", q:"In a nested loop, which loop finishes all of its repeats first before moving on?",
+        options:["The outer loop","The inner loop","Both finish at the same time","Neither loop finishes"], correct:1,
+        explanation:'For every single round of the outer loop, the inner loop must run through all of its repeats before the outer loop moves forward.'},
+      {type:"output", code:'total = 0\nfor i in range(1,3):\n    for j in range(1,3):\n        total += 1\nprint(total)', q:"What gets printed?",
+        options:['2','4','6','8'], correct:1,
+        explanation:'range(1,3) gives 2 values (1 and 2), so the inner loop runs 2 x 2 = 4 times total.'},
+      {type:"debug", code:'for i in range(2):\n    for j in range(2):\n    print(i, j)', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","print is not indented far enough to be inside the inner loop","range(2) is invalid","The outer loop is missing a colon"], correct:1,
+        explanation:"print(i, j) needs to be indented one more level to be inside the inner for loop; right now it's not deep enough."},
+    ]
+  },
+  {
+    id:8, title:"Lists", icon:"📋",
+    desc:"Store and organize groups of items in order.",
+    questions:[
+      {type:"output", code:'fruits = ["apple", "banana", "cherry"]\nprint(fruits[0])', q:"What gets printed?",
+        options:['apple','banana','cherry','Error'], correct:0,
+        explanation:"Lists start counting from 0, so fruits[0] is the first item, 'apple'."},
+      {type:"output", code:'fruits = ["apple", "banana", "cherry"]\nprint(fruits[1])', q:"What gets printed?",
+        options:['apple','banana','cherry','Error'], correct:1,
+        explanation:"fruits[1] refers to the second item in the list, which is 'banana'."},
+      {type:"output", code:'nums = [10, 20, 30]\nprint(len(nums))', q:"What gets printed?",
+        options:['2','3','30','Error'], correct:1,
+        explanation:'len() counts how many items are in the list, and there are 3 numbers.'},
+      {type:"debug", code:'fruits = ["apple", "banana"]\nprint(fruits[2])', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Index 2 doesn't exist — the list only has indexes 0 and 1","Lists can't hold text","print doesn't work on lists"], correct:1,
+        explanation:'With only 2 items, valid indexes are 0 and 1. Index 2 is out of range and will cause an error.'},
+      {type:"output", code:'nums = [1, 2, 3]\nnums.append(4)\nprint(nums)', q:"What gets printed?",
+        options:['[1, 2, 3]','[1, 2, 3, 4]','[4, 1, 2, 3]','Error'], correct:1,
+        explanation:'append() adds a new item to the end of the list, so 4 is added after 3.'},
+      {type:"fillup", code:'colors = ["red", "green", "blue"]\nprint(colors[___])', q:"Fill in the blank to print 'blue'.",
+        options:['2','3','0','1'], correct:0,
+        explanation:"'blue' is the third item, and since counting starts at 0, its index is 2."},
+      {type:"output", code:'nums = [5, 10, 15]\nnums[1] = 99\nprint(nums)', q:"What gets printed?",
+        options:['[5, 10, 15]','[5, 99, 15]','[99, 10, 15]','Error'], correct:1,
+        explanation:'nums[1] refers to the second item, so setting it to 99 replaces 10 with 99.'},
+      {type:"concept", q:"What does the len() function do?",
+        options:["Adds an item to a list","Removes an item from a list","Tells you how many items are in a list","Sorts a list"], correct:2,
+        explanation:'len() returns the number of items a list (or other sequence) contains.'},
+      {type:"output", code:'nums = [1, 2, 3, 4, 5]\nprint(nums[-1])', q:"What gets printed?",
+        options:['1','5','4','Error'], correct:1,
+        explanation:'Negative indexes count from the end. -1 refers to the last item, which is 5.'},
+      {type:"debug", code:'nums = [1, 2, 3]\nnums.add(4)', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Lists use append(), not add(), to add an item","Lists can only hold 3 items","4 should be in quotes"], correct:1,
+        explanation:'Python lists use the append() method to add new items — there is no add() method for lists.'},
+      {type:"output", code:'nums = [1, 2, 3]\nnums.remove(2)\nprint(nums)', q:"What gets printed?",
+        options:['[1, 3]','[1, 2]','[2, 3]','Error'], correct:0,
+        explanation:'remove() deletes the first matching value from the list, so 2 is taken out, leaving [1, 3].'},
+      {type:"fillup", code:'nums = [1, 2, 3]\nprint(___(nums))', q:"Fill in the blank to print how many items are in nums.",
+        options:['len','count','size','total'], correct:0,
+        explanation:'len() is the correct function for counting the items in a list.'},
+      {type:"output", code:'a = [1, 2]\nb = [3, 4]\nprint(a + b)', q:"What gets printed?",
+        options:['[4, 6]','[1, 2, 3, 4]','Error','[1, 2]'], correct:1,
+        explanation:'Using + on two lists joins them together into one longer list, rather than adding the numbers.'},
+      {type:"concept", q:"What number is the FIRST item in a Python list?",
+        options:["Index 1","Index 0","Index -1","Index 2"], correct:1,
+        explanation:'Python lists are zero-indexed, meaning counting starts at 0 for the first item.'},
+      {type:"output", code:'nums = [10, 20, 30, 40]\nprint(nums[1:3])', q:"What gets printed? (this is called slicing)",
+        options:['[10, 20]','[20, 30]','[20, 30, 40]','[10, 20, 30]'], correct:1,
+        explanation:'Slicing [1:3] grabs items starting at index 1 up to (but not including) index 3, giving [20, 30].'},
+    ]
+  },
+  {
+    id:9, title:"Tuple", icon:"📦",
+    desc:"Store items that can't be changed once created.",
+    questions:[
+      {type:"output", code:'point = (3, 4)\nprint(point[0])', q:"What gets printed?", options:['3','4','(3, 4)','Error'], correct:0,
+        explanation:'Tuples use the same indexing as lists, so point[0] gives the first item, 3.'},
+      {type:"concept", q:"What makes a tuple different from a list?",
+        options:["A tuple can only hold numbers","A tuple cannot be changed after it's created","A tuple can only hold one item","A tuple has no indexes"], correct:1,
+        explanation:"Tuples are 'immutable', meaning once created, their items cannot be changed, added, or removed."},
+      {type:"debug", code:'point = (1, 2)\npoint[0] = 5', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Tuples cannot be changed once created","point needs to be a list first","1 and 2 should be in quotes"], correct:1,
+        explanation:'Tuples are immutable, so trying to change an item like point[0] causes an error.'},
+      {type:"output", code:'colors = ("red", "green", "blue")\nprint(len(colors))', q:"What gets printed?",
+        options:['2','3','4','Error'], correct:1,
+        explanation:'len() counts the items in the tuple, and there are 3 colors.'},
+      {type:"fillup", code:'point = ___3, 4___', q:"Fill in the blanks to correctly create a tuple.",
+        options:['( )','[ ]','{ }','< >'], correct:0,
+        explanation:'Tuples are written using round brackets ( ).'},
+      {type:"output", code:'nums = (10, 20, 30)\nprint(nums[-1])', q:"What gets printed?",
+        options:['10','20','30','Error'], correct:2,
+        explanation:'Negative index -1 refers to the last item in the tuple, which is 30.'},
+      {type:"concept", q:"Why might a programmer choose a tuple instead of a list?",
+        options:["To make data that shouldn't be changed","To make the code run slower","Because tuples can't store text","Because tuples have no order"], correct:0,
+        explanation:'Tuples are useful when you want to protect data from being accidentally changed later in the program.'},
+      {type:"output", code:'point = (5, 10)\nx, y = point\nprint(x)', q:"What gets printed?",
+        options:['5','10','(5, 10)','Error'], correct:0,
+        explanation:"This is called 'unpacking' — x takes the first value (5) and y takes the second value (10)."},
+      {type:"debug", code:'colors = ("red", "green")\ncolors.append("blue")', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Tuples don't have an append() method since they can't be changed","'blue' needs no quotes","colors should be a number"], correct:1,
+        explanation:"Since tuples are immutable, they don't support methods like append() that would change their contents."},
+      {type:"output", code:'t = (1, 2, 3)\nprint(t[1:3])', q:"What gets printed?",
+        options:['(1, 2)','(2, 3)','(1, 2, 3)','Error'], correct:1,
+        explanation:'Slicing works the same on tuples as lists: [1:3] grabs index 1 up to (not including) index 3.'},
+      {type:"concept", q:"Which brackets are used to create a tuple?",
+        options:["Square brackets [ ]","Curly brackets { }","Round brackets ( )","Angle brackets < >"], correct:2,
+        explanation:'Round brackets ( ) are used for tuples, while [ ] are used for lists.'},
+      {type:"output", code:'single = (5,)\nprint(type(single))', q:"What gets printed?",
+        options:["<class 'tuple'>","<class 'int'>","<class 'list'>","Error"], correct:0,
+        explanation:'Adding a comma after a single value inside parentheses makes it a tuple, so type() reports it as tuple.'},
+      {type:"fillup", code:'single = (5___', q:"Fill in the blank so Python treats this as a one-item tuple, not just the number 5.",
+        options:[',)',')',';)','.)'], correct:0,
+        explanation:'A trailing comma before the closing parenthesis is what makes Python recognize it as a tuple.'},
+      {type:"output", code:'a = (1, 2)\nb = (3, 4)\nprint(a + b)', q:"What gets printed?",
+        options:['(4, 6)','(1, 2, 3, 4)','Error','(1, 2)'], correct:1,
+        explanation:'Just like lists, using + on two tuples joins them together into one longer tuple.'},
+      {type:"concept", q:"Once a tuple is created, which of these can you do?",
+        options:["Change one of its values","Add a new value to it","Read its values using an index","Remove a value from it"], correct:2,
+        explanation:"You can always read values from a tuple using indexing — you just can't change, add, or remove them."},
+    ]
+  },
+  {
+    id:10, title:"Dictionary", icon:"📖",
+    desc:"Store information in key-value pairs.",
+    questions:[
+      {type:"output", code:'student = {"name": "Amy", "age": 12}\nprint(student["name"])', q:"What gets printed?",
+        options:['name','Amy','age','Error'], correct:1,
+        explanation:"Using a key like 'name' inside square brackets gives you the value stored with that key, which is 'Amy'."},
+      {type:"concept", q:"What are the two parts every dictionary entry has?",
+        options:["Index and value","Key and value","Name and number","List and item"], correct:1,
+        explanation:'Each entry in a dictionary is made of a key (like a label) and a value (the information stored under that label).'},
+      {type:"output", code:'student = {"name": "Amy", "age": 12}\nprint(student["age"])', q:"What gets printed?",
+        options:['12','age','Amy','Error'], correct:0,
+        explanation:"student['age'] looks up the value stored under the key 'age', which is 12."},
+      {type:"debug", code:'student = {"name": "Amy"}\nprint(student["grade"])', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","'grade' is not a key in the dictionary","Dictionaries can't use square brackets","student needs to be a list"], correct:1,
+        explanation:"Since 'grade' was never added as a key, trying to look it up will cause a KeyError."},
+      {type:"fillup", code:'student = {"name": "Amy"___ "age": 12}', q:"Fill in the blank to correctly separate the two entries.",
+        options:[',',';','.',':'], correct:0,
+        explanation:'A comma is used to separate different key-value pairs inside a dictionary.'},
+      {type:"output", code:'student = {"name": "Amy", "age": 12}\nstudent["age"] = 13\nprint(student["age"])', q:"What gets printed?",
+        options:['12','13','age','Error'], correct:1,
+        explanation:"Assigning a new value to an existing key updates it, so 'age' now holds 13."},
+      {type:"concept", q:"What symbol connects a key to its value inside a dictionary?",
+        options:['=','==',':','->'], correct:2,
+        explanation:'A colon : separates each key from its matching value, like "name": "Amy".'},
+      {type:"output", code:'student = {"name": "Amy", "age": 12}\nstudent["grade"] = 7\nprint(student)', q:"What gets printed?",
+        options:['{"name": "Amy", "age": 12}','{"name": "Amy", "age": 12, "grade": 7}','Error','{"grade": 7}'], correct:1,
+        explanation:'Assigning a value to a brand-new key adds it as a new entry in the dictionary.'},
+      {type:"debug", code:'student = {"name" "Amy"}', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","A colon is missing between the key and value","Curly brackets should be square brackets","'name' should not be in quotes"], correct:1,
+        explanation:'Every key-value pair needs a colon between them, like "name": "Amy".'},
+      {type:"output", code:'scores = {"Amy": 90, "Ben": 85}\nprint(len(scores))', q:"What gets printed?",
+        options:['1','2','4','Error'], correct:1,
+        explanation:'len() on a dictionary counts how many key-value pairs it has, and there are 2.'},
+      {type:"concept", q:"Which brackets are used to create a dictionary?",
+        options:["Square brackets [ ]","Round brackets ( )","Curly brackets { }","Angle brackets < >"], correct:2,
+        explanation:'Curly brackets { } are used to create dictionaries in Python.'},
+      {type:"output", code:'student = {"name": "Amy"}\nprint("age" in student)', q:"What gets printed?",
+        options:['True','False','Error','age'], correct:1,
+        explanation:"'in' checks if a key exists in the dictionary. Since 'age' was never added, the result is False."},
+      {type:"fillup", code:'student = {"name": "Amy"}\nprint(student___"name"___)', q:"Fill in the blanks to correctly look up the value for 'name'.",
+        options:['[ ]','( )','{ }','< >'], correct:0,
+        explanation:'Square brackets are used to look up a value by its key, just like with lists but using a key instead of a number.'},
+      {type:"output", code:'inventory = {"apples": 5, "bananas": 3}\ninventory["apples"] += 2\nprint(inventory["apples"])', q:"What gets printed?",
+        options:['5','2','7','Error'], correct:2,
+        explanation:'+= adds to the existing value, so 5 + 2 = 7.'},
+      {type:"concept", q:"Can two different keys in the same dictionary have the same name?",
+        options:["Yes, always","No, each key must be unique","Only for numbers","Only for text"], correct:1,
+        explanation:'Every key in a dictionary must be unique — if you reuse a key, it just overwrites the old value.'},
+    ]
+  },
+  {
+    id:11, title:"Functions", icon:"⚙️",
+    desc:"Build your own reusable mini-programs.",
+    questions:[
+      {type:"output", code:'def greet():\n    print("Hello!")\n\ngreet()', q:"What gets printed?",
+        options:['Hello!','greet','Nothing','Error'], correct:0,
+        explanation:"Calling greet() runs the code inside the function, which prints 'Hello!'."},
+      {type:"debug", code:'def greet()\n    print("Hi")', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Missing a colon after the parentheses","greet needs to be capitalized","print needs no arguments"], correct:1,
+        explanation:'Every function definition needs a colon : right after its parentheses.'},
+      {type:"output", code:'def add(a, b):\n    return a + b\n\nprint(add(3, 4))', q:"What gets printed?",
+        options:['3','4','7','34'], correct:2,
+        explanation:'The function adds its two inputs together: 3 + 4 = 7.'},
+      {type:"concept", q:"What does the return keyword do in a function?",
+        options:["Prints text to the screen","Sends a value back to wherever the function was called","Stops the whole program","Repeats the function"], correct:1,
+        explanation:'return sends a result back out of the function so it can be used elsewhere, like being stored or printed.'},
+      {type:"fillup", code:'___ multiply(a, b):\n    return a * b', q:"Fill in the blank to define a function.",
+        options:['def','function','func','define'], correct:0,
+        explanation:'def is the keyword Python uses to start a function definition.'},
+      {type:"output", code:'def square(n):\n    return n * n\n\nresult = square(5)\nprint(result)', q:"What gets printed?",
+        options:['5','10','25','Error'], correct:2,
+        explanation:'square(5) returns 5 * 5, which is 25, and that gets stored in result.'},
+      {type:"debug", code:'def greet(name):\n    print("Hi " + name)\n\ngreet()', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","greet() needs an argument for name, since the function requires one","print should be return","name needs no quotes"], correct:1,
+        explanation:'The function expects one input called name, but greet() was called without giving it anything.'},
+      {type:"output", code:'def double(n):\n    return n * 2\n\nprint(double(4) + double(1))', q:"What gets printed?",
+        options:['5','8','10','Error'], correct:2,
+        explanation:'double(4) is 8 and double(1) is 2, and 8 + 2 = 10.'},
+      {type:"concept", q:"What are the values passed into a function called?",
+        options:["Returns","Arguments (or parameters)","Loops","Keys"], correct:1,
+        explanation:'The values you send into a function when calling it are called arguments, matching the function\'s parameters.'},
+      {type:"output", code:'def greet(name="friend"):\n    print("Hi " + name)\n\ngreet()', q:"What gets printed?",
+        options:['Hi friend','Hi','Error','name'], correct:0,
+        explanation:"Since no name was given, the function uses its default value, 'friend'."},
+      {type:"fillup", code:'def add(a, b):\n    ___ a + b', q:"Fill in the blank so the function sends the sum back to the caller.",
+        options:['return','print','give','send'], correct:0,
+        explanation:'return is used to send a value back from a function, unlike print which only displays it.'},
+      {type:"output", code:'def is_even(n):\n    return n % 2 == 0\n\nprint(is_even(4))', q:"What gets printed?",
+        options:['True','False','4','Error'], correct:0,
+        explanation:'4 % 2 equals 0, and 0 == 0 is True, so the function returns True.'},
+      {type:"debug", code:'def add(a, b):\n    result = a + b\nprint(add(2, 3))', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","The function never returns result, so it gives back nothing (None)","2 and 3 need quotes","print should be inside the function"], correct:1,
+        explanation:'Without a return statement, the function calculates result but never sends it back, so add(2,3) gives None.'},
+      {type:"concept", q:"Why are functions useful in programming?",
+        options:["They make code run slower on purpose","They let you reuse the same block of code without rewriting it","They delete unused variables","They only work with numbers"], correct:1,
+        explanation:'Functions let you write a piece of logic once and reuse it wherever you need it, saving time and reducing mistakes.'},
+      {type:"output", code:'def greet(name):\n    return "Hi " + name\n\nmessage = greet("Sam")\nprint(message)', q:"What gets printed?",
+        options:['Hi Sam','Sam','greet','Error'], correct:0,
+        explanation:"greet('Sam') returns the text 'Hi Sam', which gets stored in message and then printed."},
+    ]
+  },
+  {
+    id:12, title:"Lambda Functions", icon:"✨",
+    desc:"Write tiny one-line functions.",
+    questions:[
+      {type:"concept", q:"What is a lambda function?",
+        options:["A function with no name that fits on one line","A loop that repeats forever","A special kind of list","A way to delete functions"], correct:0,
+        explanation:'A lambda function is a small, unnamed (anonymous) function written in a single line, often used for short, simple tasks.'},
+      {type:"output", code:'square = lambda x: x * x\nprint(square(5))', q:"What gets printed?",
+        options:['5','10','25','Error'], correct:2,
+        explanation:'The lambda multiplies its input by itself: 5 * 5 = 25.'},
+      {type:"fillup", code:'add = ___ a, b: a + b\nprint(add(2, 3))', q:"Fill in the blank to create a lambda function.",
+        options:['lambda','def','function','func'], correct:0,
+        explanation:'lambda is the keyword used to create a small, one-line anonymous function.'},
+      {type:"debug", code:'square = lambda x: return x * x', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","Lambda functions never use the word return — the result after the colon is returned automatically","x needs to be in quotes","lambda needs a def before it"], correct:1,
+        explanation:'Lambdas automatically return the value of their expression — adding return causes an error.'},
+      {type:"output", code:'double = lambda n: n * 2\nprint(double(7))', q:"What gets printed?",
+        options:['7','9','14','Error'], correct:2,
+        explanation:'The lambda doubles its input: 7 * 2 = 14.'},
+      {type:"concept", q:"How does a regular function (def) usually compare to a lambda function?",
+        options:["A lambda can hold many lines of complex logic, a def cannot","A def can hold many lines of logic, while a lambda is limited to one simple expression","They are exactly identical in every way","Lambdas must always have a name"], correct:1,
+        explanation:'Regular functions (def) can contain multiple lines and complex logic, while lambdas are meant for short, single-expression tasks.'},
+      {type:"output", code:'greet = lambda name: "Hi " + name\nprint(greet("Sam"))', q:"What gets printed?",
+        options:['Hi Sam','Sam','greet','Error'], correct:0,
+        explanation:"The lambda joins 'Hi ' with the given name, producing 'Hi Sam'."},
+      {type:"fillup", code:'is_even = lambda n: n % 2 ___ 0', q:"Fill in the blank so the lambda checks if a number is even.",
+        options:['==','=','!=','//'], correct:0,
+        explanation:'== checks for equality — a number is even when its remainder after dividing by 2 equals 0.'},
+      {type:"output", code:'numbers = [1, 2, 3, 4]\nsquared = list(map(lambda x: x * x, numbers))\nprint(squared)', q:"What gets printed?",
+        options:['[1, 2, 3, 4]','[1, 4, 9, 16]','[2, 4, 6, 8]','Error'], correct:1,
+        explanation:'map() applies the lambda to every number in the list, squaring each one: 1, 4, 9, 16.'},
+      {type:"concept", q:"Lambda functions are often used with which of these?",
+        options:["map() and filter()","print() only","while loops only","Dictionaries only"], correct:0,
+        explanation:'Lambdas are commonly used as short, quick functions passed into tools like map() and filter().'},
+      {type:"output", code:'nums = [1, 2, 3, 4, 5]\nevens = list(filter(lambda x: x % 2 == 0, nums))\nprint(evens)', q:"What gets printed?",
+        options:['[1, 3, 5]','[2, 4]','[1, 2, 3, 4, 5]','Error'], correct:1,
+        explanation:"filter() keeps only the numbers where the lambda's condition is True, which are the even numbers 2 and 4."},
+      {type:"debug", code:'add = lambda a, b:\n    a + b', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","A lambda's expression must be on the same line, right after the colon","a and b need quotes","lambda needs a return keyword"], correct:1,
+        explanation:'Lambdas must be written on a single line — the expression cannot be placed on the next line.'},
+      {type:"output", code:'multiply = lambda a, b: a * b\nprint(multiply(3, 4))', q:"What gets printed?",
+        options:['7','12','34','Error'], correct:1,
+        explanation:'The lambda multiplies its two inputs: 3 * 4 = 12.'},
+      {type:"concept", q:"Which of these is the correct basic structure of a lambda function?",
+        options:["lambda arguments: expression","def arguments: expression","lambda: arguments expression","expression: lambda arguments"], correct:0,
+        explanation:'A lambda always follows the pattern lambda arguments: expression, all on one line.'},
+      {type:"output", code:'triple = lambda n: n * 3\nprint(triple(4) + triple(2))', q:"What gets printed?",
+        options:['6','12','18','Error'], correct:2,
+        explanation:'triple(4) is 12 and triple(2) is 6, and 12 + 6 = 18.'},
+    ]
+  },
+  {
+    id:13, title:"Recursive Functions", icon:"🌀",
+    desc:"Functions that call themselves to solve problems.",
+    questions:[
+      {type:"concept", q:"What is a recursive function?",
+        options:["A function that calls itself to solve a smaller version of the same problem","A function that never returns anything","A function that only runs once","A function with no parameters"], correct:0,
+        explanation:'Recursive functions solve a problem by calling themselves with a smaller or simpler input, until reaching a stopping point.'},
+      {type:"concept", q:"What is the 'base case' in a recursive function?",
+        options:["The very first line of the function","The condition that stops the function from calling itself again","The slowest part of the function","The part that always causes an error"], correct:1,
+        explanation:'The base case is the stopping condition — without it, a recursive function would call itself forever.'},
+      {type:"output", code:'def countdown(n):\n    if n <= 0:\n        print("Liftoff!")\n    else:\n        print(n)\n        countdown(n - 1)\n\ncountdown(3)', q:"What gets printed (in order)?",
+        options:['3, 2, 1, Liftoff!','1, 2, 3, Liftoff!','3, 2, 1','Liftoff!'], correct:0,
+        explanation:"The function prints 3, then calls itself with 2, then 1, and finally hits the base case n<=0 and prints 'Liftoff!'."},
+      {type:"debug", code:'def countdown(n):\n    print(n)\n    countdown(n - 1)', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","There is no base case, so the function will call itself forever","n needs to be a string","countdown should not take any arguments"], correct:1,
+        explanation:'Without a stopping condition (base case), this function keeps calling itself endlessly and will crash the program.'},
+      {type:"output", code:'def factorial(n):\n    if n == 1:\n        return 1\n    else:\n        return n * factorial(n - 1)\n\nprint(factorial(4))', q:"What gets printed?",
+        options:['4','10','24','Error'], correct:2,
+        explanation:'factorial(4) computes 4 x 3 x 2 x 1, which equals 24.'},
+      {type:"fillup", code:'def factorial(n):\n    if n == 1:\n        return 1\n    else:\n        return n * ___(n - 1)', q:"Fill in the blank so the function calls itself.",
+        options:['factorial','return','n','print'], correct:0,
+        explanation:'A recursive function calls its own name again, here with a smaller value, n - 1.'},
+      {type:"output", code:'def sum_to(n):\n    if n == 0:\n        return 0\n    else:\n        return n + sum_to(n - 1)\n\nprint(sum_to(3))', q:"What gets printed?",
+        options:['3','6','9','0'], correct:1,
+        explanation:'sum_to(3) computes 3 + 2 + 1 + 0, which equals 6.'},
+      {type:"concept", q:"What could happen if a recursive function is missing its base case?",
+        options:["It runs faster than normal","It causes infinite recursion and crashes the program","It automatically fixes itself","Nothing different happens"], correct:1,
+        explanation:"Without a base case, the function keeps calling itself forever, eventually crashing with a 'maximum recursion depth' error."},
+      {type:"output", code:'def countdown(n):\n    if n <= 0:\n        print("Done")\n        return\n    print(n)\n    countdown(n - 1)\n\ncountdown(2)', q:"What gets printed (in order)?",
+        options:['2, 1, Done','1, 2, Done','2, 1','Done'], correct:0,
+        explanation:"The function prints 2, then calls itself with 1, prints 1, then calls itself with 0, which triggers the base case and prints 'Done'."},
+      {type:"debug", code:'def factorial(n):\n    return n * factorial(n - 1)', q:"What's wrong with this code?",
+        options:["Nothing, it works fine","There's no base case to stop the recursion","n should start at 1","factorial should not multiply"], correct:1,
+        explanation:"Without a stopping condition like 'if n == 1: return 1', this function will call itself endlessly."},
+      {type:"concept", q:"Recursive functions are especially good for problems that can be broken into...",
+        options:["Completely unrelated smaller problems","Smaller versions of the exact same problem","Only math problems","Problems with no pattern at all"], correct:1,
+        explanation:'Recursion works best when a big problem can be solved using smaller versions of itself, like counting down or calculating a factorial.'},
+      {type:"output", code:'def power(base, exp):\n    if exp == 0:\n        return 1\n    return base * power(base, exp - 1)\n\nprint(power(2, 3))', q:"What gets printed?",
+        options:['5','6','8','Error'], correct:2,
+        explanation:'power(2,3) computes 2 x 2 x 2, which equals 8.'},
+      {type:"fillup", code:'def countdown(n):\n    if n ___ 0:\n        print("Liftoff!")\n    else:\n        print(n)\n        countdown(n - 1)', q:"Fill in the blank to correctly create the base case.",
+        options:['<=','>=','!=','and'], correct:0,
+        explanation:'The base case should trigger once n reaches 0 or below, so <= 0 is correct.'},
+      {type:"output", code:'def sum_digits(n):\n    if n == 0:\n        return 0\n    return n % 10 + sum_digits(n // 10)\n\nprint(sum_digits(123))', q:"What gets printed?",
+        options:['6','123','3','1'], correct:0,
+        explanation:'The function adds each digit: 3 + 2 + 1 = 6.'},
+      {type:"concept", q:"Compared to a simple loop, what is often true about recursion?",
+        options:["It's always faster and simpler","It can solve the same problem but works by having the function call itself instead of repeating with a loop","It cannot be used for counting","It never needs a stopping condition"], correct:1,
+        explanation:'Recursion and loops can often solve the same kinds of repeating problems, but recursion does it by having a function call itself rather than looping.'},
+    ]
+  },
+];
+
+const TIME_PER_Q = 15; // seconds
+const PASS_THRESHOLD = 0.6; // 60% to unlock next level
+
+/* ============ STATE ============ */
+let progress = { unlockedLevel: 1, completed: {} }; // completed[levelId] = {score, total, passed}
+let current = { levelIdx:null, qIndex:0, score:0, timer:null, timeLeft:TIME_PER_Q, answered:false };
+
+const STORAGE_KEY = "code_quest_progress";
+
+async function loadProgress(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      progress = Object.assign(progress, parsed);
+    }
+  }catch(e){ /* no saved progress yet, that's fine */ }
+  renderMap();
+}
+
+async function saveProgress(){
+  try{
+    await window.storage.set(STORAGE_KEY, JSON.stringify(progress), false);
+  }catch(e){ console.warn("Could not save progress", e); }
+}
+
+/* ============ MAP RENDERING ============ */
+function levelState(level){
+  if(progress.completed[level.id] && progress.completed[level.id].passed) return "completed";
+  if(level.placeholder) return "locked";
+  if(level.id <= progress.unlockedLevel) return "unlocked";
+  return "locked";
+}
+
+function renderMap(){
+  const container = document.getElementById("levelNodes");
+  container.innerHTML = "";
+  LEVELS.forEach(level=>{
+    const state = levelState(level);
+    const node = document.createElement("div");
+    node.className = "node " + state;
+
+    const badge = document.createElement("div");
+    badge.className = "badge";
+    badge.innerHTML = state === "locked" ? "🔒" : `<span class="badge-emoji">${level.icon}</span>`;
+
+    const card = document.createElement("div");
+    card.className = "card";
+    let tagText = "Locked";
+    if(state === "unlocked") tagText = "Ready to play";
+    if(state === "completed"){
+      const r = progress.completed[level.id];
+      tagText = `Completed · ${r.score}/${r.total}`;
+    }
+    if(level.placeholder) tagText = "Coming soon";
+
+    card.innerHTML = `
+      <h3>Level ${level.id}: ${level.title}</h3>
+      <p>${level.desc}</p>
+      <span class="tag">${tagText}</span>
+    `;
+
+    if(state !== "locked" && !level.placeholder){
+      card.onclick = ()=> startLevel(level.id);
+    }
+
+    node.appendChild(badge);
+    node.appendChild(card);
+    container.appendChild(node);
+  });
+}
+
+/* ============ QUIZ FLOW ============ */
+function startLevel(levelId){
+  const idx = LEVELS.findIndex(l=>l.id===levelId);
+  current = { levelIdx:idx, qIndex:0, score:0, timer:null, timeLeft:TIME_PER_Q, answered:false };
+  document.getElementById("mapScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("quizScreen").style.display = "block";
+  document.getElementById("quizTitle").textContent = `Level ${levelId}: ${LEVELS[idx].title}`;
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const level = LEVELS[current.levelIdx];
+  const q = level.questions[current.qIndex];
+  current.answered = false;
+  current.timeLeft = TIME_PER_Q;
+
+  document.getElementById("qProgress").textContent = `Q ${current.qIndex+1}/${level.questions.length}`;
+  document.getElementById("qScoreLive").textContent = `Score: ${current.score}`;
+  document.getElementById("qType").textContent = ({
+    output:"📤 Predict the output", debug:"🐛 Find the bug", fillup:"✏️ Fill in the blank", concept:"💡 Concept check"
+  })[q.type];
+  document.getElementById("qType").className = "q-type " + q.type;
+  document.getElementById("qText").textContent = q.q;
+
+  const codeEl = document.getElementById("qCode");
+  if(q.code){ codeEl.style.display = "block"; codeEl.textContent = q.code; }
+  else{ codeEl.style.display = "none"; }
+
+  const optWrap = document.getElementById("qOptions");
+  optWrap.innerHTML = "";
+  q.options.forEach((opt, i)=>{
+    const btn = document.createElement("button");
+    btn.className = "opt";
+    btn.textContent = opt;
+    btn.onclick = ()=> selectAnswer(i);
+    optWrap.appendChild(btn);
+  });
+
+  document.getElementById("qFeedback").textContent = "";
+  document.getElementById("nextBtn").style.display = "none";
+
+  startTimer();
+}
+
+function startTimer(){
+  clearInterval(current.timer);
+  updateTimerUI();
+  current.timer = setInterval(()=>{
+    current.timeLeft -= 1;
+    updateTimerUI();
+    if(current.timeLeft <= 0){
+      clearInterval(current.timer);
+      if(!current.answered) selectAnswer(-1); // time's up, no answer
+    }
+  }, 1000);
+}
+
+function updateTimerUI(){
+  const pct = Math.max(0, (current.timeLeft / TIME_PER_Q) * 100);
+  const bar = document.getElementById("timerBar");
+  bar.style.width = pct + "%";
+  bar.className = "timer-bar" + (current.timeLeft <= 6 ? " warn" : "");
+  document.getElementById("qTimeLeft").textContent = `⏱ ${Math.max(0,current.timeLeft)}s`;
+}
+
+function selectAnswer(choiceIdx){
+  if(current.answered) return;
+  current.answered = true;
+  clearInterval(current.timer);
+
+  const level = LEVELS[current.levelIdx];
+  const q = level.questions[current.qIndex];
+  const opts = document.querySelectorAll("#qOptions .opt");
+  opts.forEach((btn,i)=>{
+    btn.disabled = true;
+    if(i === q.correct) btn.classList.add("correct");
+    else if(i === choiceIdx) btn.classList.add("wrong");
+  });
+
+  const fb = document.getElementById("qFeedback");
+  const explanation = q.explanation || "";
+  if(choiceIdx === -1){
+    fb.innerHTML = `<span class="fb-status timeup">⏰ Time's up!</span>` +
+      (explanation ? `<span class="fb-explain">${explanation}</span>` : "");
+  } else if(choiceIdx === q.correct){
+    current.score += 1;
+    fb.innerHTML = `<span class="fb-status correct">✅ Correct!</span>` +
+      (explanation ? `<span class="fb-explain">${explanation}</span>` : "");
+  } else {
+    fb.innerHTML = `<span class="fb-status wrong">❌ Not quite.</span>` +
+      (explanation ? `<span class="fb-explain">${explanation}</span>` : "");
+  }
+  document.getElementById("qScoreLive").textContent = `Score: ${current.score}`;
+
+  const nextBtn = document.getElementById("nextBtn");
+  nextBtn.style.display = "inline-block";
+  nextBtn.textContent = (current.qIndex === level.questions.length - 1) ? "See Results →" : "Next Question →";
+  nextBtn.onclick = ()=>{
+    if(current.qIndex === level.questions.length - 1){
+      finishLevel();
+    } else {
+      current.qIndex += 1;
+      renderQuestion();
+    }
+  };
+}
+
+function nextPlayableId(fromIdx){
+  for(let i=fromIdx+1; i<LEVELS.length; i++){
+    if(!LEVELS[i].placeholder) return LEVELS[i].id;
+  }
+  return null;
+}
+
+function finishLevel(){
+  const level = LEVELS[current.levelIdx];
+  const total = level.questions.length;
+  const passed = current.score / total >= PASS_THRESHOLD;
+
+  progress.completed[level.id] = { score: current.score, total, passed };
+  if(passed && level.id === progress.unlockedLevel){
+    const nextId = nextPlayableId(current.levelIdx);
+    if(nextId !== null) progress.unlockedLevel = nextId;
+  }
+  saveProgress();
+
+  document.getElementById("quizScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "block";
+
+  const pct = current.score/total;
+  const stars = pct >= 0.9 ? "⭐⭐⭐" : pct >= 0.6 ? "⭐⭐" : "⭐";
+  document.getElementById("resultStars").textContent = stars;
+  document.getElementById("resultScore").textContent = `${current.score} / ${total}`;
+
+  const msgEl = document.getElementById("resultMsg");
+  if(passed){
+    msgEl.className = "result-msg pass";
+    msgEl.textContent = (nextPlayableId(current.levelIdx) !== null)
+      ? "Level passed! The next level is now unlocked. 🎉"
+      : "Level passed! Great job. 🎉";
+  } else {
+    msgEl.className = "result-msg fail";
+    msgEl.textContent = `You need ${Math.ceil(total*PASS_THRESHOLD)}/${total} to unlock the next level. Give this level another go from the map!`;
+  }
+}
+
+document.getElementById("backToMapBtn").onclick = ()=>{
+  document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("mapScreen").style.display = "block";
+  renderMap();
+};
+
+/* ============ PROGRESS CODE (works without login) ============ */
+function encodeProgress(){
+  const json = JSON.stringify(progress);
+  // unicode-safe base64 encoding
+  const bytes = new TextEncoder().encode(json);
+  let binary = "";
+  bytes.forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
+
+function decodeProgress(code){
+  const binary = atob(code.trim());
+  const bytes = new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+  const json = new TextDecoder().decode(bytes);
+  const parsed = JSON.parse(json);
+  if(typeof parsed.unlockedLevel !== "number" || typeof parsed.completed !== "object"){
+    throw new Error("Not a valid progress code");
+  }
+  return parsed;
+}
+
+const pcToggle = document.getElementById("pcToggle");
+const pcBody = document.getElementById("pcBody");
+pcToggle.onclick = ()=>{
+  pcBody.style.display = pcBody.style.display === "none" ? "block" : "none";
+};
+
+document.getElementById("pcGenerateBtn").onclick = ()=>{
+  const code = encodeProgress();
+  const box = document.getElementById("pcCodeOutput");
+  box.value = code;
+  box.style.display = "block";
+  document.getElementById("pcCopyBtn").style.display = "inline-block";
+  document.getElementById("pcCopyStatus").textContent = "";
+};
+
+document.getElementById("pcCopyBtn").onclick = async ()=>{
+  const box = document.getElementById("pcCodeOutput");
+  const statusEl = document.getElementById("pcCopyStatus");
+  try{
+    await navigator.clipboard.writeText(box.value);
+    statusEl.className = "pc-status";
+    statusEl.textContent = "✅ Copied! Paste this somewhere safe to use later.";
+  }catch(e){
+    box.select();
+    statusEl.className = "pc-status";
+    statusEl.textContent = "Select and copy the highlighted text manually.";
+  }
+};
+
+document.getElementById("pcLoadBtn").onclick = ()=>{
+  const input = document.getElementById("pcCodeInput").value;
+  const statusEl = document.getElementById("pcLoadStatus");
+  if(!input.trim()){
+    statusEl.className = "pc-status error";
+    statusEl.textContent = "Paste a progress code first.";
+    return;
+  }
+  try{
+    const restored = decodeProgress(input);
+    progress = restored;
+    saveProgress(); // also try to persist to storage in case it's available
+    renderMap();
+    statusEl.className = "pc-status";
+    statusEl.textContent = "✅ Progress loaded! Your map has been updated.";
+  }catch(e){
+    statusEl.className = "pc-status error";
+    statusEl.textContent = "That code doesn't look right — double check you copied the whole thing.";
+  }
+};
+
+loadProgress();
+</script>
+</body>
+</html>
