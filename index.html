@@ -247,6 +247,120 @@
   .pc-status{font-size:12.5px; color:var(--mint); min-height:18px;}
   .pc-status.error{color:var(--coral);}
   .pc-divider{height:1px; background:var(--bg-panel-2); margin:16px 0;}
+
+  /* ---------- Toolbar ---------- */
+  .toolbar{max-width:900px; margin:0 auto 18px; display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;}
+  .progress-btn{
+    background:var(--bg-panel); border:1px solid var(--bg-panel-2); color:var(--ink);
+    padding:9px 16px; border-radius:10px; font-family:'Baloo 2',sans-serif; font-weight:700;
+    font-size:13.5px; cursor:pointer;
+  }
+  .progress-btn:hover{border-color:var(--teal); color:var(--teal);}
+
+  /* ---------- Result breakdown (per-attempt) ---------- */
+  .result-breakdown{
+    text-align:left; background:var(--bg-panel-2); border-radius:12px; padding:14px 16px; margin-bottom:22px;
+  }
+  .result-breakdown .rb-row{
+    display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-bottom:6px;
+  }
+  .result-breakdown .rb-row:last-child{margin-bottom:0;}
+  .result-breakdown .rb-label{color:var(--ink-dim);}
+  .result-breakdown .rb-value{font-family:'Space Mono',monospace; color:var(--ink);}
+
+  /* ---------- Progress dashboard ---------- */
+  .progress-screen{display:none;}
+  .progress-card{
+    background:var(--bg-panel); border:1px solid var(--bg-panel-2); border-radius:22px;
+    padding:32px 30px; max-width:640px; margin:0 auto;
+  }
+  .progress-title{font-family:'Baloo 2',sans-serif; font-size:26px; margin:0 0 20px; text-align:center;}
+  .progress-subhead{
+    font-family:'Baloo 2',sans-serif; font-size:16px; color:var(--ink-dim);
+    margin:26px 0 12px; text-transform:uppercase; letter-spacing:0.5px; font-size:13px;
+  }
+  .progress-summary{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:10px; text-align:center;
+  }
+  .progress-summary .stat{
+    background:var(--bg-panel-2); border-radius:12px; padding:14px 8px;
+  }
+  .progress-summary .stat .num{
+    font-family:'Baloo 2',sans-serif; font-weight:800; font-size:24px; color:var(--gold);
+  }
+  .progress-summary .stat .lbl{font-size:11px; color:var(--ink-dim); margin-top:4px;}
+
+  .type-bar-row{margin-bottom:14px;}
+  .type-bar-row .tb-top{display:flex; justify-content:space-between; font-size:13px; margin-bottom:5px;}
+  .type-bar-row .tb-name{color:var(--ink);}
+  .type-bar-row .tb-pct{font-family:'Space Mono',monospace; color:var(--ink-dim);}
+  .type-bar-track{background:var(--bg-panel-2); border-radius:8px; height:10px; overflow:hidden;}
+  .type-bar-fill{height:100%; border-radius:8px; transition:width .4s ease;}
+  .type-bar-fill.strong{background:var(--mint);}
+  .type-bar-fill.mid{background:var(--gold);}
+  .type-bar-fill.weak{background:var(--coral);}
+
+  .strength-callout{
+    margin-top:16px; background:var(--bg-panel-2); border-radius:12px; padding:14px 16px;
+    font-size:13.5px; line-height:1.6; color:var(--ink-dim);
+  }
+  .strength-callout b{color:var(--ink);}
+
+  .history-list{display:flex; flex-direction:column; gap:8px;}
+  .history-item{
+    display:flex; justify-content:space-between; align-items:center;
+    background:var(--bg-panel-2); border-radius:10px; padding:10px 14px; font-size:13px;
+  }
+  .history-item .hi-left{display:flex; flex-direction:column;}
+  .history-item .hi-level{font-weight:700; color:var(--ink);}
+  .history-item .hi-date{font-size:11px; color:var(--ink-dim); margin-top:2px;}
+  .history-item .hi-score{font-family:'Space Mono',monospace;}
+  .history-item .hi-score.pass{color:var(--mint);}
+  .history-item .hi-score.fail{color:var(--coral);}
+  .history-empty{color:var(--ink-dim); font-size:13px; text-align:center; padding:14px 0;}
+
+  /* ---------- Level-wise performance (donut charts) ---------- */
+  .level-perf-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(108px, 1fr)); gap:12px;
+  }
+  .lp-card{
+    background:var(--bg-panel-2); border-radius:14px; padding:14px 8px 12px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+  }
+  .lp-icon{font-size:18px; margin-bottom:4px;}
+  .lp-donut-wrap{position:relative; width:64px; height:64px; margin-bottom:8px;}
+  .lp-donut-wrap svg{width:100%; height:100%;}
+  .lp-donut-pct{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:'Space Mono',monospace; font-size:12px; color:var(--ink);
+  }
+  .lp-card.not-attempted .lp-donut-pct{color:var(--ink-dim);}
+  .lp-title{font-family:'Baloo 2',sans-serif; font-size:11.5px; line-height:1.3; margin-bottom:3px; min-height:28px; display:flex; align-items:center;}
+  .lp-score{font-size:10.5px; color:var(--ink-dim);}
+
+  /* ---------- Difficulty select screen ---------- */
+  .difficulty-screen{display:none;}
+  .difficulty-card{
+    background:var(--bg-panel); border:1px solid var(--bg-panel-2); border-radius:22px;
+    padding:36px 30px; max-width:600px; margin:0 auto 30px; text-align:center;
+  }
+  .difficulty-title{font-family:'Baloo 2',sans-serif; font-size:24px; margin:0 0 8px;}
+  .difficulty-sub{color:var(--ink-dim); font-size:13.5px; margin:0 0 26px; line-height:1.5;}
+  .difficulty-options{display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px;}
+  @media (max-width:560px){ .difficulty-options{grid-template-columns:1fr;} }
+  .diff-btn{
+    display:flex; flex-direction:column; align-items:center; gap:5px;
+    background:var(--bg-panel-2); border:2px solid transparent; border-radius:16px;
+    padding:20px 14px; cursor:pointer; transition:transform .12s ease, border-color .12s ease;
+  }
+  .diff-btn:hover{transform:translateY(-2px);}
+  .diff-btn.selected{border-color:var(--gold); background:rgba(255,201,60,0.1);}
+  .diff-btn .diff-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; color:var(--ink);}
+  .diff-btn .diff-time{font-family:'Space Mono',monospace; font-size:12px; color:var(--teal);}
+  .diff-btn .diff-desc{font-size:11.5px; color:var(--ink-dim);}
+  .diff-btn.diff-easy:hover{border-color:var(--mint);}
+  .diff-btn.diff-medium:hover{border-color:var(--gold);}
+  .diff-btn.diff-hard:hover{border-color:var(--coral);}
 </style>
 </head>
 <body>
@@ -256,6 +370,36 @@
     <div class="eyebrow">Level up your python skills</div>
     <h1>🐍 Code Quest</h1>
     <p>Beat each level to unlock the next one on the trail.</p>
+  </div>
+
+  <div class="toolbar">
+    <button class="progress-btn" id="openDifficultyBtn">⏱ Difficulty: Medium</button>
+    <button class="progress-btn" id="openProgressBtn">📊 My Progress</button>
+  </div>
+
+  <!-- DIFFICULTY SELECT -->
+  <div id="difficultyScreen" class="difficulty-screen">
+    <div class="difficulty-card">
+      <h2 class="difficulty-title">⏱ Choose Your Difficulty</h2>
+      <p class="difficulty-sub">This sets how many seconds you get to answer each question. You can change it anytime.</p>
+      <div class="difficulty-options">
+        <button class="diff-btn diff-easy" data-diff="easy">
+          <span class="diff-name">🟢 Easy</span>
+          <span class="diff-time">30 sec / question</span>
+          <span class="diff-desc">Take your time</span>
+        </button>
+        <button class="diff-btn diff-medium" data-diff="medium">
+          <span class="diff-name">🟡 Medium</span>
+          <span class="diff-time">20 sec / question</span>
+          <span class="diff-desc">A good challenge</span>
+        </button>
+        <button class="diff-btn diff-hard" data-diff="hard">
+          <span class="diff-name">🔴 Hard</span>
+          <span class="diff-time">15 sec / question</span>
+          <span class="diff-desc">For quick thinkers</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- LEVEL MAP -->
@@ -318,7 +462,29 @@
       <div class="result-stars" id="resultStars"></div>
       <div class="result-score" id="resultScore"></div>
       <div class="result-msg" id="resultMsg"></div>
+      <div class="result-breakdown" id="resultBreakdown"></div>
       <button class="map-btn" id="backToMapBtn">Back to Map</button>
+    </div>
+  </div>
+
+  <!-- PROGRESS DASHBOARD -->
+  <div id="progressScreen" class="progress-screen">
+    <div class="progress-card">
+      <h2 class="progress-title">📊 My Progress</h2>
+
+      <div class="progress-summary" id="progressSummary"></div>
+
+      <h3 class="progress-subhead">Strengths &amp; Weaknesses</h3>
+      <div class="type-bars" id="typeBars"></div>
+      <div class="strength-callout" id="strengthCallout"></div>
+
+      <h3 class="progress-subhead">Level-by-Level Performance</h3>
+      <div class="level-perf-grid" id="levelPerfGrid"></div>
+
+      <h3 class="progress-subhead">Recent Activity</h3>
+      <div class="history-list" id="historyList"></div>
+
+      <button class="map-btn" id="progressBackBtn">Back to Map</button>
     </div>
   </div>
 
@@ -947,12 +1113,24 @@ const LEVELS = [
   },
 ];
 
-const TIME_PER_Q = 15; // seconds
+const DIFFICULTY_TIMES = { easy: 30, medium: 20, hard: 15 }; // seconds per question
+const DIFFICULTY_LABELS = { easy: "Easy", medium: "Medium", hard: "Hard" };
+let TIME_PER_Q = DIFFICULTY_TIMES.medium; // updated once a difficulty is chosen
 const PASS_THRESHOLD = 0.6; // 60% to unlock next level
 
 /* ============ STATE ============ */
-let progress = { unlockedLevel: 1, completed: {} }; // completed[levelId] = {score, total, passed}
-let current = { levelIdx:null, qIndex:0, score:0, timer:null, timeLeft:TIME_PER_Q, answered:false };
+let progress = {
+  unlockedLevel: 1,
+  completed: {}, // completed[levelId] = {score, total, passed}
+  stats: { byType: {
+    output:{correct:0,total:0}, debug:{correct:0,total:0}, fillup:{correct:0,total:0}, concept:{correct:0,total:0}
+  }},
+  history: [], // [{levelId, title, score, total, passed, date}]
+  difficulty: null // "easy" | "medium" | "hard" — set on first launch
+};
+let current = { levelIdx:null, qIndex:0, score:0, timer:null, timeLeft:TIME_PER_Q, answered:false, typeTally:{} };
+
+const TYPE_LABELS = { output:"Predict the Output", debug:"Find the Bug", fillup:"Fill in the Blank", concept:"Concept Checks" };
 
 const STORAGE_KEY = "code_quest_progress";
 
@@ -964,7 +1142,26 @@ async function loadProgress(){
       progress = Object.assign(progress, parsed);
     }
   }catch(e){ /* no saved progress yet, that's fine */ }
-  renderMap();
+  if(!progress.stats || !progress.stats.byType){
+    progress.stats = { byType: { output:{correct:0,total:0}, debug:{correct:0,total:0}, fillup:{correct:0,total:0}, concept:{correct:0,total:0} } };
+  }
+  ["output","debug","fillup","concept"].forEach(t=>{
+    if(!progress.stats.byType[t]) progress.stats.byType[t] = {correct:0,total:0};
+  });
+  if(!Array.isArray(progress.history)) progress.history = [];
+
+  if(progress.difficulty && DIFFICULTY_TIMES[progress.difficulty]){
+    TIME_PER_Q = DIFFICULTY_TIMES[progress.difficulty];
+    updateDifficultyButtonLabel();
+    document.getElementById("difficultyScreen").style.display = "none";
+    document.getElementById("mapScreen").style.display = "block";
+    renderMap();
+  } else {
+    // first launch — ask for a difficulty before showing the map
+    document.getElementById("mapScreen").style.display = "none";
+    document.getElementById("difficultyScreen").style.display = "block";
+    renderDifficultyOptions();
+  }
 }
 
 async function saveProgress(){
@@ -972,6 +1169,40 @@ async function saveProgress(){
     await window.storage.set(STORAGE_KEY, JSON.stringify(progress), false);
   }catch(e){ console.warn("Could not save progress", e); }
 }
+
+/* ============ DIFFICULTY SELECT ============ */
+function updateDifficultyButtonLabel(){
+  const label = progress.difficulty ? DIFFICULTY_LABELS[progress.difficulty] : "Medium";
+  document.getElementById("openDifficultyBtn").textContent = `⏱ Difficulty: ${label}`;
+}
+
+function renderDifficultyOptions(){
+  document.querySelectorAll(".diff-btn").forEach(btn=>{
+    btn.classList.toggle("selected", btn.dataset.diff === progress.difficulty);
+  });
+}
+
+function setDifficulty(level){
+  progress.difficulty = level;
+  TIME_PER_Q = DIFFICULTY_TIMES[level];
+  updateDifficultyButtonLabel();
+  saveProgress();
+  document.getElementById("difficultyScreen").style.display = "none";
+  document.getElementById("mapScreen").style.display = "block";
+  renderMap();
+}
+
+document.querySelectorAll(".diff-btn").forEach(btn=>{
+  btn.onclick = ()=> setDifficulty(btn.dataset.diff);
+});
+
+document.getElementById("openDifficultyBtn").onclick = ()=>{
+  document.getElementById("mapScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("progressScreen").style.display = "none";
+  document.getElementById("difficultyScreen").style.display = "block";
+  renderDifficultyOptions();
+};
 
 /* ============ MAP RENDERING ============ */
 function levelState(level){
@@ -1022,9 +1253,11 @@ function renderMap(){
 /* ============ QUIZ FLOW ============ */
 function startLevel(levelId){
   const idx = LEVELS.findIndex(l=>l.id===levelId);
-  current = { levelIdx:idx, qIndex:0, score:0, timer:null, timeLeft:TIME_PER_Q, answered:false };
+  current = { levelIdx:idx, qIndex:0, score:0, timer:null, timeLeft:TIME_PER_Q, answered:false,
+    typeTally:{ output:{correct:0,total:0}, debug:{correct:0,total:0}, fillup:{correct:0,total:0}, concept:{correct:0,total:0} } };
   document.getElementById("mapScreen").style.display = "none";
   document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("progressScreen").style.display = "none";
   document.getElementById("quizScreen").style.display = "block";
   document.getElementById("quizTitle").textContent = `Level ${levelId}: ${LEVELS[idx].title}`;
   renderQuestion();
@@ -1092,6 +1325,18 @@ function selectAnswer(choiceIdx){
 
   const level = LEVELS[current.levelIdx];
   const q = level.questions[current.qIndex];
+  const isCorrect = choiceIdx === q.correct;
+
+  // track per-question-type performance, both for this attempt and lifetime
+  const tally = current.typeTally[q.type];
+  const lifetime = progress.stats.byType[q.type];
+  if(tally) tally.total += 1;
+  if(lifetime) lifetime.total += 1;
+  if(isCorrect){
+    if(tally) tally.correct += 1;
+    if(lifetime) lifetime.correct += 1;
+  }
+
   const opts = document.querySelectorAll("#qOptions .opt");
   opts.forEach((btn,i)=>{
     btn.disabled = true;
@@ -1104,7 +1349,7 @@ function selectAnswer(choiceIdx){
   if(choiceIdx === -1){
     fb.innerHTML = `<span class="fb-status timeup">⏰ Time's up!</span>` +
       (explanation ? `<span class="fb-explain">${explanation}</span>` : "");
-  } else if(choiceIdx === q.correct){
+  } else if(isCorrect){
     current.score += 1;
     fb.innerHTML = `<span class="fb-status correct">✅ Correct!</span>` +
       (explanation ? `<span class="fb-explain">${explanation}</span>` : "");
@@ -1144,6 +1389,13 @@ function finishLevel(){
     const nextId = nextPlayableId(current.levelIdx);
     if(nextId !== null) progress.unlockedLevel = nextId;
   }
+
+  progress.history.push({
+    levelId: level.id, title: level.title, score: current.score, total, passed,
+    date: new Date().toISOString()
+  });
+  if(progress.history.length > 50) progress.history.shift(); // keep it from growing forever
+
   saveProgress();
 
   document.getElementById("quizScreen").style.display = "none";
@@ -1164,10 +1416,142 @@ function finishLevel(){
     msgEl.className = "result-msg fail";
     msgEl.textContent = `You need ${Math.ceil(total*PASS_THRESHOLD)}/${total} to unlock the next level. Give this level another go from the map!`;
   }
+
+  // per-attempt breakdown by question type
+  const bd = document.getElementById("resultBreakdown");
+  const rows = Object.keys(current.typeTally)
+    .filter(t => current.typeTally[t].total > 0)
+    .map(t=>{
+      const s = current.typeTally[t];
+      return `<div class="rb-row"><span class="rb-label">${TYPE_LABELS[t]}</span><span class="rb-value">${s.correct}/${s.total}</span></div>`;
+    }).join("");
+  bd.innerHTML = rows;
 }
 
 document.getElementById("backToMapBtn").onclick = ()=>{
   document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("mapScreen").style.display = "block";
+  renderMap();
+};
+
+/* ============ PROGRESS DASHBOARD ============ */
+function formatDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { month:'short', day:'numeric' }) + " · " +
+         d.toLocaleTimeString(undefined, { hour:'numeric', minute:'2-digit' });
+}
+
+function renderProgressDashboard(){
+  // --- summary stats ---
+  const byType = progress.stats.byType;
+  const totalAnswered = Object.values(byType).reduce((sum,t)=>sum+t.total, 0);
+  const totalCorrect = Object.values(byType).reduce((sum,t)=>sum+t.correct, 0);
+  const overallPct = totalAnswered > 0 ? Math.round((totalCorrect/totalAnswered)*100) : 0;
+  const levelsCompleted = Object.values(progress.completed).filter(c=>c.passed).length;
+  const playableLevels = LEVELS.length;
+
+  document.getElementById("progressSummary").innerHTML = `
+    <div class="stat"><div class="num">${levelsCompleted}/${playableLevels}</div><div class="lbl">Levels Passed</div></div>
+    <div class="stat"><div class="num">${totalAnswered}</div><div class="lbl">Questions Answered</div></div>
+    <div class="stat"><div class="num">${overallPct}%</div><div class="lbl">Overall Accuracy</div></div>
+  `;
+
+  // --- type breakdown bars ---
+  const typeOrder = ["output","debug","fillup","concept"];
+  const barsHtml = typeOrder.map(t=>{
+    const s = byType[t];
+    const pct = s.total > 0 ? Math.round((s.correct/s.total)*100) : 0;
+    const fillClass = s.total === 0 ? "mid" : (pct >= 80 ? "strong" : pct >= 50 ? "mid" : "weak");
+    return `
+      <div class="type-bar-row">
+        <div class="tb-top">
+          <span class="tb-name">${TYPE_LABELS[t]}</span>
+          <span class="tb-pct">${s.total > 0 ? pct + "% (" + s.correct + "/" + s.total + ")" : "No data yet"}</span>
+        </div>
+        <div class="type-bar-track"><div class="type-bar-fill ${fillClass}" style="width:${s.total>0?pct:0}%;"></div></div>
+      </div>`;
+  }).join("");
+  document.getElementById("typeBars").innerHTML = barsHtml;
+
+  // --- strength / weakness callout ---
+  const MIN_ATTEMPTS = 3;
+  const eligible = typeOrder
+    .map(t=>({ type:t, ...byType[t], pct: byType[t].total>0 ? byType[t].correct/byType[t].total : null }))
+    .filter(t=>t.total >= MIN_ATTEMPTS);
+
+  const calloutEl = document.getElementById("strengthCallout");
+  if(eligible.length === 0){
+    calloutEl.innerHTML = `Answer a few more questions of each type and I'll show you your strongest and weakest areas here.`;
+  } else {
+    const sorted = [...eligible].sort((a,b)=>b.pct - a.pct);
+    const strongest = sorted[0];
+    const weakest = sorted[sorted.length-1];
+    let html = `💪 <b>Strongest area:</b> ${TYPE_LABELS[strongest.type]} (${Math.round(strongest.pct*100)}% correct).`;
+    if(weakest.type !== strongest.type && weakest.pct < 0.8){
+      html += `<br>🎯 <b>Focus on:</b> ${TYPE_LABELS[weakest.type]} (${Math.round(weakest.pct*100)}% correct) — try replaying a level with a few of these to build it up.`;
+    } else if(weakest.pct >= 0.8){
+      html += `<br>🌟 Great work — you're doing well across every question type!`;
+    }
+    calloutEl.innerHTML = html;
+  }
+
+  // --- level-by-level performance (donut charts) ---
+  const gridEl = document.getElementById("levelPerfGrid");
+  const R = 16; // svg circle radius
+  const CIRC = 2 * Math.PI * R;
+  gridEl.innerHTML = LEVELS.map(level=>{
+    const result = progress.completed[level.id];
+    const attempted = !!result;
+    const pct = attempted ? Math.round((result.score / result.total) * 100) : 0;
+    const colorVar = !attempted ? "var(--bg-panel-2)" : (pct >= 90 ? "var(--mint)" : pct >= 60 ? "var(--gold)" : "var(--coral)");
+    const offset = attempted ? CIRC - (pct/100)*CIRC : CIRC;
+    const centerLabel = attempted ? pct + "%" : "—";
+    const scoreLabel = attempted ? `${result.score}/${result.total}` : "Not played yet";
+
+    return `
+      <div class="lp-card ${attempted ? '' : 'not-attempted'}">
+        <div class="lp-icon">${level.icon}</div>
+        <div class="lp-donut-wrap">
+          <svg viewBox="0 0 40 40">
+            <circle cx="20" cy="20" r="${R}" fill="none" stroke="var(--bg-panel)" stroke-width="4"/>
+            <circle cx="20" cy="20" r="${R}" fill="none" stroke="${colorVar}" stroke-width="4"
+              stroke-dasharray="${CIRC.toFixed(2)}" stroke-dashoffset="${offset.toFixed(2)}"
+              stroke-linecap="round" transform="rotate(-90 20 20)"/>
+          </svg>
+          <div class="lp-donut-pct">${centerLabel}</div>
+        </div>
+        <div class="lp-title">L${level.id}: ${level.title}</div>
+        <div class="lp-score">${scoreLabel}</div>
+      </div>`;
+  }).join("");
+
+  // --- recent history ---
+  const historyEl = document.getElementById("historyList");
+  if(progress.history.length === 0){
+    historyEl.innerHTML = `<div class="history-empty">No attempts yet — play a level to start tracking your progress!</div>`;
+  } else {
+    const recent = [...progress.history].reverse().slice(0, 10);
+    historyEl.innerHTML = recent.map(h=>`
+      <div class="history-item">
+        <div class="hi-left">
+          <span class="hi-level">Level ${h.levelId}: ${h.title}</span>
+          <span class="hi-date">${formatDate(h.date)}</span>
+        </div>
+        <span class="hi-score ${h.passed ? 'pass' : 'fail'}">${h.score}/${h.total} ${h.passed ? '✅' : '❌'}</span>
+      </div>
+    `).join("");
+  }
+}
+
+document.getElementById("openProgressBtn").onclick = ()=>{
+  document.getElementById("mapScreen").style.display = "none";
+  document.getElementById("resultScreen").style.display = "none";
+  document.getElementById("progressScreen").style.display = "block";
+  renderProgressDashboard();
+};
+
+document.getElementById("progressBackBtn").onclick = ()=>{
+  document.getElementById("progressScreen").style.display = "none";
   document.getElementById("mapScreen").style.display = "block";
   renderMap();
 };
@@ -1191,6 +1575,14 @@ function decodeProgress(code){
   if(typeof parsed.unlockedLevel !== "number" || typeof parsed.completed !== "object"){
     throw new Error("Not a valid progress code");
   }
+  // fill in safe defaults for codes generated before stats/history existed
+  if(!parsed.stats || !parsed.stats.byType){
+    parsed.stats = { byType: { output:{correct:0,total:0}, debug:{correct:0,total:0}, fillup:{correct:0,total:0}, concept:{correct:0,total:0} } };
+  }
+  ["output","debug","fillup","concept"].forEach(t=>{
+    if(!parsed.stats.byType[t]) parsed.stats.byType[t] = {correct:0,total:0};
+  });
+  if(!Array.isArray(parsed.history)) parsed.history = [];
   return parsed;
 }
 
@@ -1234,6 +1626,10 @@ document.getElementById("pcLoadBtn").onclick = ()=>{
   try{
     const restored = decodeProgress(input);
     progress = restored;
+    if(progress.difficulty && DIFFICULTY_TIMES[progress.difficulty]){
+      TIME_PER_Q = DIFFICULTY_TIMES[progress.difficulty];
+      updateDifficultyButtonLabel();
+    }
     saveProgress(); // also try to persist to storage in case it's available
     renderMap();
     statusEl.className = "pc-status";
